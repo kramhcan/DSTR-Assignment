@@ -1,6 +1,6 @@
-##DSTR Assigment
-###CT077-3-2-DSTR
+## DSTR Assigment
+### CT077-3-2-DSTR
 ------------------------
-###Data Structures
+### Data Structures
 **Linked List**
 **Queue**
