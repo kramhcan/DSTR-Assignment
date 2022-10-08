@@ -101,10 +101,10 @@ void Station::ViewAllStations(Node* head)
     while(curr!= NULL){
         double price = 0.0;
         price = CalculatePriceByDistance(curr, "Forward");
-        cout << "\n==============================\n";
+        cout << "\n==============================\n\n";
         cout << "Station ID : " << curr->StationID <<endl;
         cout << "Station Name : " << curr->StationName <<endl;
-        cout << "==============================\n" << endl;
+        cout << "\n==============================" << endl;
 
         if (curr->NextStationDistance != 0) {
             cout << "\t\t|" << endl;
