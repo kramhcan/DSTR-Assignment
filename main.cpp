@@ -19,6 +19,8 @@ class Node {
         string NextStationName;
         int NextStationDistance;
         // double NextStationCost;
+
+        //Linked list pointer
         Node* next;
 };
 
@@ -34,8 +36,35 @@ class Station {
         void ViewAllStations(Node* head);
         double CalculatePriceByDistance(Node* head, string direction);
         int CalculateTimeByDistance(Node* head, string direction);
+
+        int DisplaySelectionOfPositionsReturnCount(Node* head);
 };
 
+
+class Queue {
+    public:
+        string* username;
+        string* password;
+        string* role;
+
+        int capacity, front, rear;
+        // int * count;
+
+        Queue(int size)
+        {
+            username = new string[size];
+            password = new string[size];
+            role = new string[size];
+
+            front = rear = 0;
+            capacity = size;
+            // count = new int;
+        }
+        void Enqueue(string username, string password, string role);
+        string LoginUser(string name, string password);
+};
+
+#pragma region LinkedList
 void Station::AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance, string nextID, string nextName, int nextDistance)
 {
 	Node* newNode = new Node;
@@ -89,6 +118,7 @@ int Station::CalculateTimeByDistance(Node* head, string direction)
     return time;
 }
 
+//Displays summary of all stations
 void Station::ViewAllStations(Node* head)
 {
     Node* curr = head;
@@ -118,6 +148,61 @@ void Station::ViewAllStations(Node* head)
     }
 }
 
+int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
+{
+    Node* curr = head;
+    int count = 0;
+
+    cout << "\n*======================Select Position======================*\n\n";
+    while (curr != NULL){
+        cout << count << "--->> " <<  endl;
+        cout << "     Station ID : " << curr->StationID << " || Station Name : " << curr->StationName <<endl;
+
+        count++;
+
+        if (curr->NextStationDistance == 0){
+            cout << count << "--->> " <<  endl;
+        }
+
+        curr = curr->next;
+    }
+    cout << "\n*===========================================================*\n\n";
+
+    return count;
+}
+
+#pragma endregion
+
+#pragma region Queue
+    void Queue::Enqueue(string usr, string pwd, string rl)
+    {
+        if(capacity == rear) 
+        {
+            printf("\nQueue is full\n");
+            return;
+        }
+        else
+        {
+            username[rear] = usr;
+            password[rear] = pwd;
+            role[rear] = rl;
+            rear++;
+        }
+        return;
+    }
+
+    string Queue::LoginUser(string usr, string pwd)
+    {
+        for (int i = front; i <= rear; i++)
+        {
+            if (usr == username[i] && pwd == password[i]) {
+                return "Yes";
+            }
+        }
+        return "No";
+    }
+
+#pragma endregion
 int main()
 {
     Node* head = NULL;
@@ -131,7 +216,24 @@ int main()
     station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5, "SS08", "Chan Sow Lin", 5);
     station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5, "N/A", "N/A", 0);
 
-    station.ViewAllStations(head);
+    // // station.ViewAllStations(head);
+    // int test = station.DisplaySelectionOfPositionsReturnCount(head);
+    
+
+    Queue q(5);
+    q.Enqueue("usr0", "1234", "admin");
+    q.Enqueue("usr1", "1234", "admin");
+    q.Enqueue("usr2", "1234", "admin");
+
+    string usr, pwd;
+    cout << "Username : ";
+    cin >> usr;
+    cout << "Password : ";
+    cin >> pwd;
+
+    cout << q.LoginUser(usr, pwd);
+
+
     return 0;
 }
 
