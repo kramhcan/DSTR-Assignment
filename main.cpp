@@ -205,19 +205,19 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
 #pragma endregion
 int main()
 {
-    // Node* head = NULL;
-    // Station station;
-    // station.AddStationFront(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0, "SS02", "PTWC", 4);
-    // station.AddStationFront(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4, "SS03", "Sultan Ismail", 8);
-    // station.AddStationFront(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8, "SS04", "Majlis Jamek", 8);
-    // station.AddStationFront(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8, "SS05", "Plaza Rakyat", 6);
-    // station.AddStationFront(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6, "SS06", "Hang Tuah", 10);
-    // station.AddStationFront(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10, "SS07", "Pudu", 5);
-    // station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5, "SS08", "Chan Sow Lin", 5);
-    // station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5, "N/A", "N/A", 0);
+    Node* head = NULL;
+    Station station;
+    station.AddStationFront(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0, "SS02", "PTWC", 4);
+    station.AddStationFront(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4, "SS03", "Sultan Ismail", 8);
+    station.AddStationFront(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8, "SS04", "Majlis Jamek", 8);
+    station.AddStationFront(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8, "SS05", "Plaza Rakyat", 6);
+    station.AddStationFront(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6, "SS06", "Hang Tuah", 10);
+    station.AddStationFront(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10, "SS07", "Pudu", 5);
+    station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5, "SS08", "Chan Sow Lin", 5);
+    station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5, "N/A", "N/A", 0);
 
-    // // station.ViewAllStations(head);
-    // int test = station.DisplaySelectionOfPositionsReturnCount(head);
+    // station.ViewAllStations(head);
+    int test = station.DisplaySelectionOfPositionsReturnCount(head);
     
 
     //sussy
