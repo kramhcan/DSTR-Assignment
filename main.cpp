@@ -103,7 +103,7 @@ double Station::CalculatePriceByDistance(Node* head, string direction)
         price =  head->PreviousStationDistance * 0.1;
         //hahahahahahaaaa
         //??
-        
+        //pull request
     }
     return price;
 }
