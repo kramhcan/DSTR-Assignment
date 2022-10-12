@@ -24,6 +24,8 @@ class Node {
 
         //Linked list pointer
         Node* next;
+
+        Node* prev;
 };
 
 //Linked List
@@ -63,7 +65,8 @@ class Queue {
             // count = new int;
         }
         void Enqueue(string username, string password, string role);
-        string LoginUser(string name, string password);
+        int LoginUser();
+        int ValidateLogin(string name, string password);
 };
 
 #pragma region LinkedList
@@ -77,20 +80,36 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
 	newNode->PreviousStationID = previousID;
 	newNode->PreviousStationName = previousName;
 	newNode->PreviousStationDistance = previousDistance;
-	// newNode->PreviousStationCost = previousCost;
-	newNode->NextStationID = nextID;
-	newNode->NextStationName = nextName;
-	newNode->NextStationDistance = nextDistance;
-    // newNode->NextStationCost = nextCost;
+	// // newNode->PreviousStationCost = previousCost;
+	// newNode->NextStationID = nextID;
+	// newNode->NextStationName = nextName;
+	// newNode->NextStationDistance = nextDistance;
+    // // newNode->NextStationCost = nextCost;
 	newNode->next = nullptr;
+
+    // If list is empty, make new head
 	if (*head == NULL)
 	{
 		*head = newNode;
 		return;
 	}
+
+    
 	while (last->next != NULL)
 		last = last->next;
+
+
+
+    //change next of last node as well as the next station values
 	last->next = newNode;
+
+    last->NextStationID == newID;
+    last->NextStationName == newName;
+    last->NextStationDistance == previousDistance;
+
+    //make last node as previous of new node
+    newNode->prev = last;
+
 	return;
 }
 
@@ -162,6 +181,7 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
 
         count++;
 
+        //stops cout at last station
         if (curr->NextStationDistance == 0){
             cout << count << "--->> " <<  endl;
         }
@@ -193,18 +213,79 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
         return;
     }
 
-    string Queue::LoginUser(string usr, string pwd)
+    int Queue::LoginUser()
+    {
+        string usr, pwd;
+        cout<<"\nPlease enter your Username : ";
+        cin >> usr ;
+        cout<<"Please enter your Password : ";
+        cin >> pwd ;
+
+        int res = ValidateLogin(usr, pwd);
+        if (res == 0 ) {
+            cout<<"Username or Password is incorrect!\n";
+            return LoginUser();
+        } else {
+            cout<<"\nLogin Successful!\n";
+            return res;
+        }
+    }
+
+    int Queue::ValidateLogin(string usr, string pwd)
     {
         for (int i = front; i <= rear; i++)
         {
             if (usr == username[i] && pwd == password[i]) {
-                return "Yes";
+                if (role[i] == "admin"){ return 1; }
+                if (role[i] == "member"){ return 2; }
             }
         }
-        return "No";
+        return 0;
     }
 
 #pragma endregion
+
+#pragma region
+int DisplayAdminMenu()
+{
+    int selection;
+    cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
+    cout<<"========== Please enter the corresponding option number ==========" << endl;
+    cout<<"1. View all stations\n";
+    cout<<"2. Add a new station\n";
+    cout<<"3. Exit system\n";
+    cout<<"==================================================================" <<endl;
+    cin >> selection;
+    //If selection is outside the range of optioons
+    if (selection <= 0 || selection > 3) { 
+        cout<<"\nNot a valid option, please select again. \n";
+        return DisplayAdminMenu();
+    }
+    return selection;
+}
+
+int DisplayStartOptions()
+{
+    int selection;
+    cout<<"\nWelcome to LRT Station system, please Login or Register" << endl;
+    cout<<"========== Please enter the corresponding option number ==========" << endl;
+    cout<<"1. Login\n";
+    cout<<"2. Register\n";
+    cout<<"==================================================================" <<endl;
+    cout<<">> Selection : ";
+    cin >> selection;
+    if (selection != 1 && selection != 2) { 
+        cout<<"\nNot a valid option, please select again. \n";
+        return DisplayStartOptions();
+    }
+    return selection;
+}
+
+void RedirectToFunction(int selection){
+    //TODO
+}
+
+
 int main()
 {
     Node* head = NULL;
@@ -229,13 +310,16 @@ int main()
     q.Enqueue("usr1", "1234", "admin");
     q.Enqueue("usr2", "1234", "admin");
 
-    string usr, pwd;
-    cout << "Username : ";
-    cin >> usr;
-    cout << "Password : ";
-    cin >> pwd;
+    int option; //selected option value
 
-    cout << q.LoginUser(usr, pwd);
+    if(DisplayStartOptions() == 1) { 
+        if(q.LoginUser() == 1){
+            option = DisplayAdminMenu();
+            RedirectToFunction(option);
+        } else {
+
+        }
+    }
 
 
     return 0;
