@@ -35,13 +35,14 @@ class Station {
         // void AddStation(Node** head, string newID, string newName, int previousID, string previousName, 
         //                 double previousDistance, double previousCost, string nextID, 
         //                 string nextName, double nextDistance, double nextCost, string position);
-        void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance, string nextID, string nextName, int nextDistance);
+        void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance);
         // void AddStationBack(Node** head, string newID, string newName, int previousID, string previousName, double previousDistance, double previousCost, string nextID, string nextName, double nextDistance, double nextCost);
         void ViewAllStations(Node* head);
         double CalculatePriceByDistance(Node* head, string direction);
         int CalculateTimeByDistance(Node* head, string direction);
 
         int DisplaySelectionOfPositionsReturnCount(Node* head);
+        void DisplayAdminMenu(Node* hd);
 };
 
 
@@ -65,12 +66,12 @@ class Queue {
             // count = new int;
         }
         void Enqueue(string username, string password, string role);
-        int LoginUser();
+        void LoginUser(Node* hd, Station st);
         int ValidateLogin(string name, string password);
 };
 
 #pragma region LinkedList
-void Station::AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance, string nextID, string nextName, int nextDistance)
+void Station::AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance)
 {
 	Node* newNode = new Node;
 	Node* last = *head;
@@ -82,8 +83,8 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
 	newNode->PreviousStationDistance = previousDistance;
 	// // newNode->PreviousStationCost = previousCost;
 	// newNode->NextStationID = nextID;
-	// newNode->NextStationName = nextName;
-	// newNode->NextStationDistance = nextDistance;
+	// newNode->NextStationName = nextDistance;
+	newNode->NextStationDistance = 0;
     // // newNode->NextStationCost = nextCost;
 	newNode->next = nullptr;
 
@@ -103,9 +104,9 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
     //change next of last node as well as the next station values
 	last->next = newNode;
 
-    last->NextStationID == newID;
-    last->NextStationName == newName;
-    last->NextStationDistance == previousDistance;
+    last->NextStationID = newID;
+    last->NextStationName = newName;
+    last->NextStationDistance = previousDistance;
 
     //make last node as previous of new node
     newNode->prev = last;
@@ -146,17 +147,20 @@ void Station::ViewAllStations(Node* head)
     string choice;
     bool IsValid = true;
     
-    cout<<"KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) - 'TITIWANGSA -> CHAN SOW LIN' STATION ROUTE \n";
+    cout<<"\nKUALA LUMPUR LIGHT RAIL TRANSIT (LRT) - 'TITIWANGSA -> CHAN SOW LIN' STATION ROUTE \n";
 
     //Forward linked list traversal
     while(curr!= NULL){
+        //Initialize price
         double price = 0.0;
+        //Function called to calculate price
         price = CalculatePriceByDistance(curr, "Forward");
+        //Print out stationID and stationName
         cout << "\n==============================\n\n";
         cout << "Station ID : " << curr->StationID <<endl;
         cout << "Station Name : " << curr->StationName <<endl;
         cout << "\n==============================" << endl;
-
+        //IF statement to check if there is next station; If next distance is 0, there is no next station, therefore will not run the commands below
         if (curr->NextStationDistance != 0) {
             cout << "\t\t|" << endl;
             cout << "\t\t| " << curr->NextStationDistance << " KM" << endl;
@@ -164,7 +168,7 @@ void Station::ViewAllStations(Node* head)
             cout << "\t\t| " << CalculateTimeByDistance(curr, "Forward") << " minutes\n\t\t|" << endl;
             cout << "\t\tV";
         }
-
+        //Set current node to next node and repeat loop
         curr = curr->next;
     }
 }
@@ -213,7 +217,7 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
         return;
     }
 
-    int Queue::LoginUser()
+    void Queue::LoginUser(Node* hd, Station st)
     {
         string usr, pwd;
         cout<<"\nPlease enter your Username : ";
@@ -222,13 +226,13 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
         cin >> pwd ;
 
         int res = ValidateLogin(usr, pwd);
-        if (res == 0 ) {
-            cout<<"Username or Password is incorrect!\n";
-            return LoginUser();
-        } else {
-            cout<<"\nLogin Successful!\n";
-            return res;
+        if (res == 1 ) {
+            return st.DisplayAdminMenu(hd);
+        } else if (res == 2) {
+            return;
         }
+        cout<<"Username or Password is incorrect!\n";
+        return LoginUser(hd, st);
     }
 
     int Queue::ValidateLogin(string usr, string pwd)
@@ -246,7 +250,7 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
 #pragma endregion
 
 #pragma region
-int DisplayAdminMenu()
+void Station::DisplayAdminMenu(Node* hd)
 {
     int selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
@@ -255,73 +259,75 @@ int DisplayAdminMenu()
     cout<<"2. Add a new station\n";
     cout<<"3. Exit system\n";
     cout<<"==================================================================" <<endl;
+    cout<<"Selection >> ";
     cin >> selection;
     //If selection is outside the range of optioons
     if (selection <= 0 || selection > 3) { 
-        cout<<"\nNot a valid option, please select again. \n";
-        return DisplayAdminMenu();
+        cout<<"\nInvalid option, please select again. \n";
+        return DisplayAdminMenu(hd);
     }
-    return selection;
+    // if (selection == 1) { return ViewAllStations(hd)}
+    return;
 }
 
-int DisplayStartOptions()
+void DisplayStartOptions(Queue q, Node* hd, Station st)
 {
     int selection;
-    cout<<"\nWelcome to LRT Station system, please Login or Register" << endl;
+    cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
     cout<<"1. Login\n";
     cout<<"2. Register\n";
     cout<<"==================================================================" <<endl;
-    cout<<">> Selection : ";
+    cout<<"Selection >> ";
     cin >> selection;
-    if (selection != 1 && selection != 2) { 
-        cout<<"\nNot a valid option, please select again. \n";
-        return DisplayStartOptions();
+    if(selection == 1) { return q.LoginUser(hd, st); }
+    if(selection == 2) { 
+        //Register user function
     }
-    return selection;
+    cout<<"\nInvalid option, please select again.\n";
+    return DisplayStartOptions(q, hd, st);
 }
 
-void RedirectToFunction(int selection){
-    //TODO
+void ReturnToAdminMenu(){
+    // int res = 0;
+    // cout<<"Return to menu? (Enter '1')"<<endl;
+    // cin >> res;
+    // if (res == 1){
+    //     DisplayAdminMenu();
+    // }
 }
-
 
 int main()
 {
     Node* head = NULL;
     Station station;
-    station.AddStationFront(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0, "SS02", "PTWC", 4);
-    station.AddStationFront(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4, "SS03", "Sultan Ismail", 8);
-    station.AddStationFront(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8, "SS04", "Majlis Jamek", 8);
-    station.AddStationFront(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8, "SS05", "Plaza Rakyat", 6);
-    station.AddStationFront(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6, "SS06", "Hang Tuah", 10);
-    station.AddStationFront(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10, "SS07", "Pudu", 5);
-    station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5, "SS08", "Chan Sow Lin", 5);
-    station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5, "N/A", "N/A", 0);
-
-    // station.ViewAllStations(head);
-    int test = station.DisplaySelectionOfPositionsReturnCount(head);
-    
+    //Add default stations
+    station.AddStationFront(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0);
+    station.AddStationFront(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4);
+    station.AddStationFront(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8);
+    station.AddStationFront(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8);
+    station.AddStationFront(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6);
+    station.AddStationFront(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10);
+    station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5);
+    station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5);
 
     //sussy
-
+    //Add default users
     Queue q(5);
     q.Enqueue("usr0", "1234", "admin");
     q.Enqueue("usr1", "1234", "admin");
     q.Enqueue("usr2", "1234", "admin");
 
-    int option; //selected option value
+    DisplayStartOptions(q, head, station);
 
-    if(DisplayStartOptions() == 1) { 
-        if(q.LoginUser() == 1){
-            option = DisplayAdminMenu();
-            RedirectToFunction(option);
-        } else {
+    // DisplayStartOptions(q, station);
+    //     if(q.LoginUser() == 1){
+    //         option = DisplayAdminMenu();
+    //         if (option == 1) { station.ViewAllStations(head);}
+    //     } else {
 
-        }
-    }
-
-
+    //     }
+    // }
     return 0;
 }
 
