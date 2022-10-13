@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 //Joey's Edit Request
@@ -35,14 +36,20 @@ class Station {
         // void AddStation(Node** head, string newID, string newName, int previousID, string previousName, 
         //                 double previousDistance, double previousCost, string nextID, 
         //                 string nextName, double nextDistance, double nextCost, string position);
-        void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance);
-        // void AddStationBack(Node** head, string newID, string newName, int previousID, string previousName, double previousDistance, double previousCost, string nextID, string nextName, double nextDistance, double nextCost);
-        void ViewAllStations(Node* head);
+        void AddStationBack(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance); //Append
+        void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int nextDistance); //Insert
+        void ViewAllStations(Node* head, string role);
+        void ViewStationDetails(Node*head, string role);
+        // void AddStationBetween();
+        // void EditStationDetails();
         double CalculatePriceByDistance(Node* head, string direction);
         int CalculateTimeByDistance(Node* head, string direction);
-
+        int GetListSize(Node* head);
         int DisplaySelectionOfPositionsReturnCount(Node* head);
         void DisplayAdminMenu(Node* hd);
+        void DisplayInsertBackForm(Node* hd, string stID, string stName, int prevDist);
+        void DisplayInsertFrontForm(Node* hd, string stID, string stName, int nextDist);
+        
 };
 
 
@@ -71,7 +78,7 @@ class Queue {
 };
 
 #pragma region LinkedList
-void Station::AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance)
+void Station::AddStationBack(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance)
 {
 	Node* newNode = new Node;
 	Node* last = *head;
@@ -95,11 +102,9 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
 		return;
 	}
 
-    
+    //Traverse to end of list
 	while (last->next != NULL)
 		last = last->next;
-
-
 
     //change next of last node as well as the next station values
 	last->next = newNode;
@@ -112,6 +117,29 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
     newNode->prev = last;
 
 	return;
+}
+
+void Station::AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int nextDistance)
+{
+    Node* newNode = new Node();
+
+    //Set new node data
+    newNode->StationID = newID;
+	newNode->StationName = newName;
+	newNode->NextStationID = (*head)->StationID;
+	newNode->NextStationName = (*head)->StationName;
+	newNode->NextStationDistance = nextDistance;
+
+    //Set previous data of following node
+    (*head)->PreviousStationID = newID;
+    (*head)->PreviousStationName = newName;
+    (*head)->PreviousStationDistance = nextDistance;
+    
+    //Set next pointer of new node
+	newNode->next = (*head);
+
+    //Set head to new node
+    (*head) = newNode;
 }
 
 double Station::CalculatePriceByDistance(Node* head, string direction)
@@ -140,13 +168,21 @@ int Station::CalculateTimeByDistance(Node* head, string direction)
     return time;
 }
 
+int Station::GetListSize(Node* head){
+    int count=0;
+    Node* curr = head;
+    while (curr!= NULL){
+        count++;
+        curr = curr->next;
+    }
+    return count;
+}
+
 //Displays summary of all stations
-void Station::ViewAllStations(Node* head)
+void Station::ViewAllStations(Node* head, string role)
 {
     Node* curr = head;
-    string choice;
-    bool IsValid = true;
-    
+
     cout<<"\nKUALA LUMPUR LIGHT RAIL TRANSIT (LRT) - 'TITIWANGSA -> CHAN SOW LIN' STATION ROUTE \n";
 
     //Forward linked list traversal
@@ -171,6 +207,71 @@ void Station::ViewAllStations(Node* head)
         //Set current node to next node and repeat loop
         curr = curr->next;
     }
+    int inp = 0;
+    while (inp != 1)
+    {
+        cout << "\nInput '1' to return to menu >> ";
+        cin >> inp;
+    }
+    if (role == "admin") { return DisplayAdminMenu(head); }
+}
+
+void Station::ViewStationDetails(Node*head, string role)
+{
+    Node* curr = head;
+
+    //Initialize price
+    double price = 0.0;
+    int size = GetListSize(head);
+    int page = 1;
+    int input = 0;
+    while(page)
+    {
+        //Print out stationID and stationName
+        cout << "\n========================Station["<<page<<"/"<<size<<"]========================\n";
+        cout << "Station ID : " << curr->StationID <<endl;
+        cout << "Station Name : " << curr->StationName <<endl;
+        cout << "Previous Station ID : " << curr->PreviousStationID <<endl;
+        cout << "Previous Station Name : " << curr->PreviousStationName <<endl;
+        cout << "Distance between previous station : " << curr->PreviousStationDistance <<endl;
+        cout << "Time between previous station : " << CalculateTimeByDistance(curr, "Backward") <<endl;
+        cout << "Cost between previous station : RM" << CalculatePriceByDistance(curr, "Backward") <<endl;
+        cout << "Next Station ID : " << curr->NextStationID <<endl;
+        cout << "Next Station Name : " << curr->NextStationName <<endl;
+        cout << "Distance between next station : " << curr->NextStationDistance <<endl;
+        cout << "Time between next station : " << CalculateTimeByDistance(curr, "Forward") <<endl;
+        cout << "Cost between next station : RM" << CalculatePriceByDistance(curr, "Forward") <<endl;
+        cout << "\n============================================================\n" << endl;
+        cout << "Next Page [1] || Previous Page [2] || Return to menu [3]\n";
+        cout << "Selection >> ";
+        cin >> input;
+        if (input == 1){
+            if(page == size) { 
+                cout << "\n***********OUT OF PAGE BOUNDS!***********!\n";
+                continue;
+            } else {
+                page++;
+                curr = curr->next;
+                continue;
+            }
+        }
+        if (input == 2){
+            if(page == 1) { 
+                cout << "\n***********OUT OF PAGE BOUNDS!***********\n";
+                continue;
+            } else {
+                page--;
+                curr = curr->prev;
+                continue;
+            }
+        }
+        //Break if selected return
+        if(input ==3){
+            break;
+        }
+    }
+    if (role == "admin")
+        { return DisplayAdminMenu(head); }
 }
 
 int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
@@ -193,10 +294,119 @@ int Station::DisplaySelectionOfPositionsReturnCount(Node* head)
         curr = curr->next;
     }
     cout << "\n*===========================================================*\n\n";
+    cout << "Selection >> ";
 
     return count;
 }
 
+void Station::DisplayInsertBackForm(Node* hd, string stID, string stName, int prevDist)
+{
+    Node* curr = hd;
+    //Traverse to end
+    while(curr->next != NULL)
+        curr = curr->next;
+    
+    //Form
+    cout<<"\n**==============INSERT AT END==============**\n";
+    cout<<"1. Station ID : " << stID <<endl;
+    cout<<"2. Station Name : " << stName <<endl;
+    cout<<"3. Previous Station ID : "<<curr->StationID<<endl;
+    cout<<"4. Previous Station Name : "<<curr->StationName<<endl;
+    cout<<"5. Distance between previous station : " << prevDist;
+    cout<<"\n**=========================================**\n";
+    cout<<"Type in 'CANCEL' to stop operation and return to previous page*\n\n";
+    if(stID == "") { 
+        cout<<"Enter Station ID : ";
+        cin>>stID;
+        return DisplayInsertBackForm(hd, stID, stName, prevDist);
+    } else if (stID == "CANCEL") { return DisplayAdminMenu(hd); }
+    if(stName == "") { 
+        cout<<"Enter Station Name : ";
+        getline(cin, stName);
+        return DisplayInsertBackForm(hd, stID, stName, prevDist);
+    } else if (stName == "CANCEL") { return DisplayAdminMenu(hd); }
+    if(prevDist == 0) { 
+        string dist;
+        cout<<"Enter Distance Between Previous Station : ";
+        cin>>dist;
+        if (dist == "CANCEL") { return DisplayAdminMenu(hd); }
+        prevDist = stoi(dist);
+        return DisplayInsertBackForm(hd, stID, stName, prevDist);
+    }   
+    //Confirmation Check
+    string res1;
+    cout<<"\nAre you sure? [Y/n]\n";
+    cin>>res1;
+    if (res1 == "Y" || res1 == "y"){
+        AddStationBack(&hd, stID, stName, curr->StationID, curr->StationName, prevDist);
+        return DisplayAdminMenu(hd);
+    } else if (res1 == "N" || res1 == "n") {
+        //Cancel operation check
+        string res2;
+        cout<<"\nCancel Operation? [Y/n]\n";
+        cin>>res2;
+        if(res2 == "Y" || res2 == "y"){
+            return DisplayAdminMenu(hd);
+        } else {
+            return DisplayInsertBackForm(hd, "", "", 0);
+        }
+    }
+    cout<<"An error has occurred :(";
+    return;
+}
+
+void Station::DisplayInsertFrontForm(Node* hd, string stID, string stName, int nextDist)
+{
+    Node* curr = hd;
+    
+    //Form
+    cout<<"\n**=============INSERT AT FRONT=============**\n";
+    cout<<"1. Station ID : " << stID <<endl;
+    cout<<"2. Station Name : " << stName <<endl;
+    cout<<"3. Previous Station ID : "<<curr->StationID<<endl;
+    cout<<"4. Previous Station Name : "<<curr->StationName<<endl;
+    cout<<"5. Distance between next station : " << nextDist;
+    cout<<"\n**=========================================**\n";
+    cout<<"Type in 'CANCEL' to stop operation and return to previous page*\n\n";
+    if(stID == "") { 
+        cout<<"Enter Station ID : ";
+        cin>>stID;
+        return DisplayInsertBackForm(hd, stID, stName, nextDist);
+    } else if (stID == "CANCEL") { return DisplayAdminMenu(hd); }
+    if(stName == "") { 
+        cout<<"Enter Station Name : ";
+        getline(cin, stName);
+        return DisplayInsertBackForm(hd, stID, stName, nextDist);
+    } else if (stName == "CANCEL") { return DisplayAdminMenu(hd); }
+    if(nextDist == 0) { 
+        string dist;
+        cout<<"Enter Distance Between Previous Station : ";
+        cin>>dist;
+        if (dist == "CANCEL") { return DisplayAdminMenu(hd); }
+        nextDist = stoi(dist);
+        return DisplayInsertBackForm(hd, stID, stName, nextDist);
+    }   
+    //Confirmation Check
+    string res1;
+    cout<<"\nAre you sure? [Y/n]\n";
+    cin>>res1;
+    if (res1 == "Y" || res1 == "y"){
+        AddStationFront(&hd, stID, stName, curr->StationID, curr->StationName, nextDist);
+        return DisplayAdminMenu(hd);
+    } else if (res1 == "N" || res1 == "n") {
+        //Cancel operation check
+        string res2;
+        cout<<"\nCancel Operation? [Y/n]\n";
+        cin>>res2;
+        if(res2 == "Y" || res2 == "y"){
+            return DisplayAdminMenu(hd);
+        } else {
+            return DisplayInsertBackForm(hd, "", "", 0);
+        }
+    }
+    cout<<"An error has occurred :(";
+    return;
+}
 #pragma endregion
 
 #pragma region Queue
@@ -255,18 +465,33 @@ void Station::DisplayAdminMenu(Node* hd)
     int selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
-    cout<<"1. View all stations\n";
-    cout<<"2. Add a new station\n";
-    cout<<"3. Exit system\n";
+    cout<<"1. View all stations\n2. View Station Details\n3. Add a new station\n4. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
     //If selection is outside the range of optioons
-    if (selection <= 0 || selection > 3) { 
+    if (selection <= 0 || selection > 4) { 
         cout<<"\nInvalid option, please select again. \n";
         return DisplayAdminMenu(hd);
     }
-    // if (selection == 1) { return ViewAllStations(hd)}
+    if (selection == 1) { return ViewAllStations(hd, "admin");}
+    if (selection == 2) { return ViewStationDetails(hd, "admin");}
+    if (selection == 3) {
+        // int stationCount = 0;
+        // stationCount = DisplaySelectionOfPositionsReturnCount(hd);
+        int addSelection;
+        cout<<"*========PLEASE SELECT========*\n";
+        cout<<"1. Front\n2. End\n";
+        cout<<"*=============================*\n";
+        cout<<"Selection >> "; 
+        cin>>addSelection;
+        if (addSelection <= 0 || addSelection > 2) {
+            cout<<"\nInvalid option, please select again.\n";
+            return DisplayAdminMenu(hd);
+        }
+        if (addSelection == 1){ DisplayInsertFrontForm(hd, "", "", 0); }
+        if (addSelection == 2){ DisplayInsertBackForm(hd, "", "", 0); }
+    }
     return;
 }
 
@@ -275,8 +500,7 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
     int selection;
     cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
-    cout<<"1. Login\n";
-    cout<<"2. Register\n";
+    cout<<"1. Login\n2. Register\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
@@ -288,30 +512,20 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
     return DisplayStartOptions(q, hd, st);
 }
 
-void ReturnToAdminMenu(){
-    // int res = 0;
-    // cout<<"Return to menu? (Enter '1')"<<endl;
-    // cin >> res;
-    // if (res == 1){
-    //     DisplayAdminMenu();
-    // }
-}
-
 int main()
 {
     Node* head = NULL;
     Station station;
     //Add default stations
-    station.AddStationFront(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0);
-    station.AddStationFront(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4);
-    station.AddStationFront(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8);
-    station.AddStationFront(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8);
-    station.AddStationFront(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6);
-    station.AddStationFront(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10);
-    station.AddStationFront(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5);
-    station.AddStationFront(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5);
+    station.AddStationBack(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0);
+    station.AddStationBack(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4);
+    station.AddStationBack(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8);
+    station.AddStationBack(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8);
+    station.AddStationBack(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6);
+    station.AddStationBack(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10);
+    station.AddStationBack(&head, "SS07", "Pudu", "SS06", "Hang Tuah", 5);
+    station.AddStationBack(&head, "SS08", "Chan Sow Lin", "SS07", "Pudu", 5);
 
-    //sussy
     //Add default users
     Queue q(5);
     q.Enqueue("usr0", "1234", "admin");
