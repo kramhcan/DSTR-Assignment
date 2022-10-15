@@ -88,13 +88,17 @@ class PaymentNode {
         string Username;
         string FirstName;
         string LastName;
+        string UserIC;//*
         string StartID;
         string StartName;
         string EndID;
         string EndName;
         int Duration;
         double Amount;
-        string Date;
+        string TransactionDate;
+        string DepartureTime;//*
+
+
 
         PaymentNode * next;
         PaymentNode * prev;
@@ -103,23 +107,29 @@ class PaymentNode {
 class PaymentList {
     PaymentNode * Head;
     public:
-    void AddPayment(PaymentNode** head,string id, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date);
+    void AddPayment(PaymentNode** head, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date);
     void ViewPaymentDetails(PaymentNode*head, string role, string id);
     void ViewPaymentDetails(PaymentNode*head, string role, string id, string usr);
     void ViewAllPayments(PaymentNode*head, string role);
     void ViewAllPayments(PaymentNode*head, string role, string id, string usr);
+    void ViewPayments(PaymentNode*pHead, string role, string searchBy, string searchValue);
     void DisplayAdminMenu(PaymentNode* hd);
 
     int GetListSize(PaymentNode* head);
+    PaymentNode* SortList(PaymentNode* pHead, string sortBy);
+    string Minimum(string Member, PaymentNode* curr);
 };
 
 void SelectPaymentOrStation();
+void DisplaySelectSearchBy();
 
 Node* head = NULL;
 Station station;
 PaymentNode* pHead = NULL;
 PaymentList pList;
 Queue q(255);
+
+PaymentNode* sortedHead = NULL;
 
 #pragma region LinkedList
 void Station::AddStationBack(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance)
@@ -564,7 +574,7 @@ void Station::DisplayAdminMenu(Node* hd)
     int selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
-    cout<<"1. View all stations\n2. View Station Details\n3. Add a new station\n5. Exit system\n";
+    cout<<"1. View all stations\n2. View Station Details\n3. Add a new station\n4. Show Payment Menu\n5. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
@@ -591,6 +601,7 @@ void Station::DisplayAdminMenu(Node* hd)
         if (addSelection == 1){ DisplayInsertFrontForm(hd, "", "", 0); }
         if (addSelection == 2){ DisplayInsertBackForm(hd, "", "", 0); }
     } 
+    if (selection == 4) { return pList.DisplayAdminMenu(pHead); }
     return;
 }
 
@@ -680,12 +691,27 @@ void Station::DisplayAdminMenu(Node* hd)
 #pragma endregion
 
 #pragma region PaymentList
-void PaymentList::AddPayment(PaymentNode** pHead,string id, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date)
+void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date)
 {
     PaymentNode* newNode = new PaymentNode;
     PaymentNode* last = *pHead;
+    PaymentNode* last1 = last;
+    int id = 0;
 
-    newNode->PaymentID = id;
+    if (last1 != NULL)
+    {
+        while (last1->next != NULL)
+            last1 = last1->next;
+        id = stoi(last1->PaymentID);
+    }    
+    
+    id++;
+    stringstream ss;
+    string idString;
+    ss << id;
+    ss >> idString;
+
+    newNode->PaymentID = idString;
     newNode->Username = usr;
     newNode->FirstName = fst;
     newNode->LastName = lst;
@@ -695,7 +721,7 @@ void PaymentList::AddPayment(PaymentNode** pHead,string id, string usr, string f
     newNode->EndName = endName;
     newNode->Duration = duration;
     newNode->Amount = amount;
-    newNode->Date = date;
+    newNode->TransactionDate = date;
     newNode->next = nullptr;
 
     if(*pHead == NULL)
@@ -703,6 +729,7 @@ void PaymentList::AddPayment(PaymentNode** pHead,string id, string usr, string f
         *pHead = newNode;
         return;
     }
+    
     while (last->next != NULL)
         last = last->next;
 
@@ -725,25 +752,29 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
     while(page)
     {
         cout << "\n========================Ticket["<<id<<"]========================\n";
-        cout << "Ticket ID : " << curr->PaymentID <<endl;
-        cout << "Username : " << curr->Username <<endl;
-        cout << "First : " << curr->FirstName <<endl;
-        cout << "Last Name : " << curr->LastName <<endl;
-        cout << "Start Station ID : " << curr->StartID <<endl;
-        cout << "Start Station Name : " << curr->StartName <<endl;
-        cout << "End Station ID : " << curr->EndID <<endl;
-        cout << "End Station Name : " << curr->EndName <<endl;
-        cout << "Estimated Travel Duration : " << curr->Duration <<" minutes" <<endl;
-        cout << "Ticket Cost : RM " << curr->Amount <<endl;
-        cout << "Time created : " << curr->Date;
+        cout << left << setw(30)<< "Ticket ID : " << curr->PaymentID <<endl;
+        cout << left << setw(30)<< "Username : " << curr->Username <<endl;
+        cout << left << setw(30)<< "First : " << curr->FirstName <<endl;
+        cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
+        cout << left << setw(30)<< "Customer Identity Card : " << curr->UserIC <<endl;
+        cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
+        cout << left << setw(30)<< "Start Station ID : " << curr->StartID <<endl;
+        cout << left << setw(30)<< "Start Station Name : " << curr->StartName <<endl;
+        cout << left << setw(30)<< "End Station ID : " << curr->EndID <<endl;
+        cout << left << setw(30)<< "End Station Name : " << curr->EndName <<endl;
+        cout << left << setw(30)<< "Estimated Travel Duration : " << curr->Duration <<" minutes" <<endl;
+        cout << left << setw(30)<< "Departure Time: " << curr->EndName <<endl;
+        cout << left << setw(30)<< "Ticket Cost : RM " << curr->Amount <<endl;
+        cout << left << setw(30)<< "Time created : " << curr->TransactionDate;
         cout << "============================================================\n" << endl;
         cout << "Return To List [1]\n";
         cout << "Selection >> ";
         cin >> input;
-        if(input == 3){
+        if(input == 1){
             break;
         }
-    }  
+    } 
+    return ViewAllPayments(pHead, role);
 }
 
 // void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id, string usr)
@@ -812,12 +843,61 @@ void PaymentList::ViewAllPayments(PaymentNode*pHead, string role)
     return ViewAllPayments(pHead, role);
 }
 
+void PaymentList::ViewPayments(PaymentNode*pHead, string role, string searchBy, string searchValue)
+{
+    PaymentNode* curr = pHead;
+    int count = 0, page = 1;
+    int size = GetListSize(pHead);
+    string selection;
+
+    cout << "\n*========================================Tickets ["<< searchBy << " : " << searchValue <<"]========================================*\n\n";
+    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "Start Station" << left
+            << setw(15) << "End Station" << endl;
+    while (curr != NULL){
+        if(searchBy == "username" && curr->Username == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        if(searchBy == "firstName" && curr->FirstName == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        if(searchBy == "lastName" && curr->LastName == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        if(searchBy == "startStation" && curr->StartName == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        if(searchBy == "endStation" && curr->EndName == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        
+        count++;
+        curr = curr->next;
+    }
+    cout << "\n*=======================================================================================*\n\n";
+    cout << "Enter the Payment ID of the ticket to view the details.\nEnter 'BACK' to return to menu.\nEnter 'SORT' to sort list by first name.\n";
+    cout << "Selection >> ";
+    cin >> selection;
+    if (selection == "BACK"){ return DisplayAdminMenu(pHead); }
+    if (selection == "SORT"){}
+    int id = stoi(selection);
+    if (id >= 1 && id <= count){
+        return ViewPaymentDetails(pHead, role, selection);
+    }
+    cout << "***ID Out of Bounds or invalid input!***" << endl;
+    return ViewAllPayments(pHead, role);
+}
+
 void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
 {
     int selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
-    cout<<"1. View All Payments\n2. Search Payments List\n3. Exit system\n";
+    cout<<"1. View All Payments\n2. Search Payments List\n3. Show Station Menu\n4. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
@@ -827,7 +907,20 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
         return DisplayAdminMenu(pHead);
     }
     if (selection == 1) { return ViewAllPayments(pHead, "admin");}
-    // if (selection == 2) { return ViewStationDetails(pHead, "admin");}
+    if (selection == 2) { 
+        string searchSel, searchVal;
+        DisplaySelectSearchBy();
+        cin >> searchSel;
+        cout << "Enter search value (Enter station names for option 4 and 5) : ";
+        cin >> searchVal;
+        if (searchSel == "1") { ViewPayments(pHead, "admin", "username", searchVal);}
+        if (searchSel == "2") { ViewPayments(pHead, "admin", "firstName", searchVal);}
+        if (searchSel == "3") { ViewPayments(pHead, "admin", "lastName", searchVal);}
+        if (searchSel == "4") { ViewPayments(pHead, "admin", "startStation", searchVal);}
+        if (searchSel == "5") { ViewPayments(pHead, "admin", "endStation", searchVal);}
+    }
+    if (selection == 3) { station.DisplayAdminMenu(head); }
+    cout << "Thank you, have a good day.";
     return;
 }
 
@@ -839,6 +932,96 @@ int PaymentList::GetListSize(PaymentNode* pHead){
         curr = curr->next;
     }
     return count;
+}
+PaymentNode* PaymentList::SortList(PaymentNode* pHead, string sortBy){
+    PaymentNode *curr = pHead;
+    PaymentNode *sorted = new PaymentNode;
+
+    string mini;
+
+    if (sortBy == "username"){
+        mini = Minimum(sortBy, curr);
+        while(curr->Username != mini)
+            curr = curr->next;
+        sorted = curr;
+        sorted->next = NULL;
+
+    }
+        
+}
+
+string PaymentList::Minimum(string member, PaymentNode* curr)
+{
+    PaymentNode *p = curr;
+    string minimum;
+    if (member == "username")
+        {
+            minimum = p->Username;
+
+        while (p->next != NULL)
+        {
+            p = p->next;
+            if(minimum > p->Username)
+            {
+                    minimum = p->Username;
+            }
+        }
+    }
+    if (member == "firstName")
+        {
+            minimum = p->FirstName;
+
+        while (p->next != NULL)
+        {
+            p = p->next;
+            if(minimum > p->FirstName)
+            {
+                    minimum = p->FirstName;
+            }
+        }
+    }
+    if (member == "lastName")
+        {
+            minimum = p->LastName;
+
+        while (p->next != NULL)
+        {
+            p = p->next;
+            if(minimum > p->LastName)
+            {
+                    minimum = p->LastName;
+            }
+        }
+    }
+    if (member == "startStation")
+        {
+            minimum = p->StartName;
+
+        while (p->next != NULL)
+        {
+            p = p->next;
+            if(minimum > p->StartName)
+            {
+                    minimum = p->StartName;
+            }
+        }
+    }
+    if (member == "endStation")
+        {
+            minimum = p->EndName;
+
+        while (p->next != NULL)
+        {
+            p = p->next;
+            if(minimum > p->EndName)
+            {
+                    minimum = p->EndName;
+            }
+        }
+    }
+
+    return minimum;
+
 }
 #pragma endregion
 
@@ -874,7 +1057,8 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
     }
 }
 
-void SelectPaymentOrStation(){
+void SelectPaymentOrStation()
+{
     int selection;
     cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
@@ -889,6 +1073,14 @@ void SelectPaymentOrStation(){
     return SelectPaymentOrStation();
 }
 #pragma endregion
+
+void DisplaySelectSearchBy()
+{
+    cout<<"================= Search Payments By ==================" << endl;
+    cout<<"1. Username\n2. First Name\n3. Last Name\n4. Start Station\n5. End Station\n6. Back" << endl;
+    cout<<"=======================================================" <<endl;
+    cout<<"Selection >> ";
+}
 
 int main()
 {
@@ -908,21 +1100,13 @@ int main()
     q.Enqueue("usr2", "1234", "Pek", "Yen", "admin");
     q.Enqueue("usr3", "1234", "Joo", "Ee", "admin");
 
+    //Set variable for current date & time
     time_t now = time(0);
     char* dt = ctime(&now);
 
-    pList.AddPayment(&pHead, "1", "member1", "Member", "Dummy", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt);
-    // payment.ViewPaymentDetails(pHead, "admin", "1");
+    pList.AddPayment(&pHead, "member1", "Member", "Dummy", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt);
+    pList.AddPayment(&pHead, "member2", "Member", "Two", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt);
 
     DisplayStartOptions(q, head, station);
-
-    // DisplayStartOptions(q, station);
-    //     if(q.LoginUser() == 1){
-    //         option = DisplayAdminMenu();
-    //         if (option == 1) { station.ViewAllStations(head);}
-    //     } else {
-
-    //     }
-    // }
     return 0;
 }
