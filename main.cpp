@@ -36,16 +36,11 @@ class Node {
 class Station {
     Node* head;
     public:
-        // void AddStation(Node** head, string newID, string newName, int previousID, string previousName, 
-        //                 double previousDistance, double previousCost, string nextID, 
-        //                 string nextName, double nextDistance, double nextCost, string position);
         void AddStationBack(Node** head, string newID, string newName, string previousID, string previousName, int previousDistance); //Append
         void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int nextDistance); //Insert
         void EditStationDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime);
         void ViewAllStations(Node* head, string role);
         void ViewStationDetails(Node*head, string role);
-        // void AddStationBetween();
-        // void EditStationDetails();
         double CalculatePriceByDistance(Node* head, string direction);
         int CalculateTimeByDistance(Node* head, string direction);
         int GetListSize(Node* head);
@@ -107,7 +102,7 @@ class PaymentNode {
 class PaymentList {
     PaymentNode * Head;
     public:
-    void AddPayment(PaymentNode** head, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date);
+    void AddPayment(PaymentNode** head, string usr, string fst, string lst, string ic, string startID, string startName,string endID, string endName, double amount, int duration, string date, string dpt);
     void ViewPaymentDetails(PaymentNode*head, string role, string id);
     void ViewPaymentDetails(PaymentNode*head, string role, string id, string usr);
     void ViewAllPayments(PaymentNode*head, string role);
@@ -120,7 +115,7 @@ class PaymentList {
     string Minimum(string Member, PaymentNode* curr);
 };
 
-void SelectPaymentOrStation();
+void SelectPaymentOrStation(string role);
 void DisplaySelectSearchBy();
 
 Node* head = NULL;
@@ -635,9 +630,9 @@ void Station::DisplayAdminMenu(Node* hd)
 
         int res = ValidateLogin(usr, pwd);
         if (res == 1 ) {
-            return SelectPaymentOrStation();
+            return SelectPaymentOrStation("admin");
         } else if (res == 2) {
-            return;
+            return SelectPaymentOrStation("member");
         }
         cout<<"Username or Password is incorrect!\n";
         return LoginUser(hd, st);
@@ -691,7 +686,7 @@ void Station::DisplayAdminMenu(Node* hd)
 #pragma endregion
 
 #pragma region PaymentList
-void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string lst, string startID, string startName,string endID, string endName, double amount, int duration, string date)
+void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string lst, string ic, string startID, string startName,string endID, string endName, double amount, int duration, string date, string dpt)
 {
     PaymentNode* newNode = new PaymentNode;
     PaymentNode* last = *pHead;
@@ -715,6 +710,7 @@ void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string
     newNode->Username = usr;
     newNode->FirstName = fst;
     newNode->LastName = lst;
+    newNode->UserIC = ic;
     newNode->StartID = startID;
     newNode->StartName = startName;
     newNode->EndID = endID;
@@ -722,6 +718,7 @@ void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string
     newNode->Duration = duration;
     newNode->Amount = amount;
     newNode->TransactionDate = date;
+    newNode->DepartureTime = dpt;
     newNode->next = nullptr;
 
     if(*pHead == NULL)
@@ -756,7 +753,7 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
         cout << left << setw(30)<< "Username : " << curr->Username <<endl;
         cout << left << setw(30)<< "First : " << curr->FirstName <<endl;
         cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
-        cout << left << setw(30)<< "Customer Identity Card : " << curr->UserIC <<endl;
+        cout << left << setw(30)<< "Identification Number : " << curr->UserIC <<endl;
         cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
         cout << left << setw(30)<< "Start Station ID : " << curr->StartID <<endl;
         cout << left << setw(30)<< "Start Station Name : " << curr->StartName <<endl;
@@ -1057,7 +1054,7 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
     }
 }
 
-void SelectPaymentOrStation()
+void SelectPaymentOrStation(string role)
 {
     int selection;
     cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
@@ -1070,7 +1067,7 @@ void SelectPaymentOrStation()
     if(selection == 2) { return station.DisplayAdminMenu(head); }
 
     cout<<"\nInvalid option, please select again.\n";
-    return SelectPaymentOrStation();
+    return SelectPaymentOrStation(role);
 }
 #pragma endregion
 
@@ -1104,8 +1101,8 @@ int main()
     time_t now = time(0);
     char* dt = ctime(&now);
 
-    pList.AddPayment(&pHead, "member1", "Member", "Dummy", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt);
-    pList.AddPayment(&pHead, "member2", "Member", "Two", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt);
+    pList.AddPayment(&pHead, "member1", "Member", "Dummy", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20 PM");
+    pList.AddPayment(&pHead, "member2", "Member", "Two", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20 PM");
 
     DisplayStartOptions(q, head, station);
     return 0;
