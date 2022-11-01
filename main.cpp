@@ -40,6 +40,7 @@ class Station {
         void AddStationFront(Node** head, string newID, string newName, string previousID, string previousName, int nextDistance); //Insert
         void EditStationDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime);
         void ViewAllStations(Node* head, string role);
+        void ViewAllStationsDirectional(Node* head, string direction);
         void ViewStationDetails(Node*head, string role);
         double CalculatePriceByDistance(Node* head, string direction);
         int CalculateTimeByDistance(Node* head, string direction);
@@ -49,6 +50,11 @@ class Station {
         void DisplayInsertBackForm(Node* hd, string stID, string stName, int prevDist);
         void DisplayInsertFrontForm(Node* hd, string stID, string stName, int nextDist);
         void DisplayEditForm(Node * main, Node * curr);
+        bool ValidateStationID(Node* main, string stID);
+        int CalculateDurationBetweenStations(Node* hd, string station1, string station2, string direction);
+        double CalculateCostBetweenStations(Node* hd, string station1, string station2, string direction);
+        // void GetFrontGetBack(Node* hd);
+        // void GetBackGetFront(Node* hd);
         
 };
 
@@ -108,7 +114,15 @@ class PaymentList {
     void ViewAllPayments(PaymentNode*head, string role);
     void ViewAllPayments(PaymentNode*head, string role, string id, string usr);
     void ViewPayments(PaymentNode*pHead, string role, string searchBy, string searchValue);
+    void ViewPaymentsMember(PaymentNode*pHead, string searchValue);
     void DisplayAdminMenu(PaymentNode* hd);
+    void DisplayMemberMenu(PaymentNode* hd, string usr);
+    
+    //Display start purchase menu -> Select Direction -> Select stations -> Display Ticket details
+    //->Confirm purchase -> Add payment
+    void StartPurchaseMenu(PaymentNode* hd, string usr);
+    void SelectStations(PaymentNode* hd, string direction);
+    void DisplayNewTicketDetails(PaymentNode* hd, string usr, string startStID, string endStID, string direction);
 
     int GetListSize(PaymentNode* head);
     PaymentNode* SortList(PaymentNode* pHead, string sortBy);
@@ -155,6 +169,7 @@ void Station::AddStationBack(Node** head, string newID, string newName, string p
 	if (*head == NULL)
 	{
 		*head = newNode;
+        newNode->prev = NULL;
 		return;
 	}
 
@@ -282,6 +297,64 @@ void Station::ViewAllStations(Node* head, string role)
         cin >> inp;
     }
     if (role == "admin") { return DisplayAdminMenu(head); }
+}
+
+void Station::ViewAllStationsDirectional(Node* head, string direction)
+{
+    Node* curr = head;
+
+    if (direction == "Backward"){
+        cout<<"\nKUALA LUMPUR LIGHT RAIL TRANSIT (LRT) - 'CHAN SOW LIN -> TITIWANGSA' STATION ROUTE \n";
+        //if 'direction' is Backwards, traverse to end of list for reverse traversal
+        while (curr->next != NULL){
+            curr = curr->next;
+        }
+        while(curr!= NULL){
+            //Initialize price
+            double price = 0.0;
+            //Function called to calculate price
+            price = CalculatePriceByDistance(curr, direction);
+            //Print out stationID and stationName
+            cout << "\n==============================\n";
+            cout << "Station ID : " << curr->StationID <<endl;
+            cout << "Station Name : " << curr->StationName <<endl;
+            cout << "==============================" << endl;
+            //IF statement to check if there is next station; If next distance is 0, there is no next station, therefore will not run the commands below
+            if (curr->PreviousStationDistance != 0) {
+                cout << "\t\t| " << curr->PreviousStationDistance << " KM" << endl;
+                cout << "\t\t|" << " RM " << CalculatePriceByDistance(curr, direction) << endl;
+                cout << "\t\t| " << CalculateTimeByDistance(curr, direction) << " minutes" << endl;
+                cout << "\t\tV";
+            }
+            //Set current node to previous node and repeat loop
+            curr = curr->prev;
+        }
+    }
+    
+    if(direction == "Forward"){
+        cout<<"\nKUALA LUMPUR LIGHT RAIL TRANSIT (LRT) - 'TITIWANGSA -> CHAN SOW LIN' STATION ROUTE \n";
+        while(curr!= NULL){
+            //Initialize price
+            double price = 0.0;
+            //Function called to calculate price
+            price = CalculatePriceByDistance(curr, "Forward");
+            //Print out stationID and stationName
+            cout << "\n==============================\n";
+            cout << "Station ID : " << curr->StationID <<endl;
+            cout << "Station Name : " << curr->StationName <<endl;
+            cout << "==============================" << endl;
+            //IF statement to check if there is next station; If next distance is 0, there is no next station, therefore will not run the commands below
+            if (curr->NextStationDistance != 0) {
+                cout << "\t\t| " << curr->NextStationDistance << " KM" << endl;
+                cout << "\t\t|" << " RM " << CalculatePriceByDistance(curr, "Forward") << endl;
+                cout << "\t\t| " << CalculateTimeByDistance(curr, "Forward") << " minutes" << endl;
+                cout << "\t\tV";
+            }
+            //Set current node to next node and repeat loop
+            curr = curr->next;
+        }
+    }
+    return;
 }
 
 void Station::ViewStationDetails(Node*head, string role)
@@ -600,6 +673,124 @@ void Station::DisplayAdminMenu(Node* hd)
     return;
 }
 
+bool Station::ValidateStationID(Node* main, string stID)
+{
+    Node* curr = main;
+    int loop = 1;
+
+    while(true){
+        if(curr->StationID == stID){ return true; }
+        if(curr == NULL)
+            break;
+        curr = curr->next;
+    }
+
+    // if (direction == "Forward")
+    // {
+    //     while (curr->next != NULL)
+    //     {
+    //         if(curr->StationID == stID){ return true; }
+    //         curr = curr->next;
+    //     }
+    // }
+    // if (direction == "Backward")
+    // {
+    //     while (curr->next != NULL)
+    //         curr = curr->next;
+    //     while (curr->prev != NULL)
+    //     {
+    //         if(curr->StationID == stID){ return true; }
+    //         curr = curr->prev;
+    //     }
+    // }
+
+    return false;
+}
+
+int Station::CalculateDurationBetweenStations(Node* hd, string station1, string station2, string direction)
+{
+    Node* curr = new Node;
+    curr = hd;
+    int res = 0;
+
+    if (direction == "Forward"){
+        //loop until first station matches
+        while(curr->next != NULL && curr->StationID != station1)
+            curr = curr->next;
+        //from first station add next station time until end station is reached
+        while(curr->StationID != station2)
+        {
+            if (curr == NULL)
+                break;
+            res += curr->NextStationTime;
+            curr = curr->next;
+        }
+        return res;
+    }
+
+    if (direction == "Backward"){
+        //loop list until the end first
+        while(curr->next != NULL)
+            curr = curr->next;
+
+        //traverse backward until first station matches
+        while(curr->prev != NULL && curr->StationID != station1)
+            curr = curr->prev;
+        //from first station add next station time until end station is reached
+        while(curr->StationID != station2)
+        {
+            if (curr == NULL)
+                break;
+            res += curr->PreviousStationTime;
+            curr = curr->prev;
+        }
+        return res;
+    }
+    return res;
+}
+
+double Station::CalculateCostBetweenStations(Node* hd, string station1, string station2, string direction)
+{
+    Node* curr = new Node;
+    curr = hd;
+    double res = 0;
+
+    if (direction == "Forward"){
+        //loop until first station matches
+        while(curr->next != NULL && curr->StationID != station1)
+            curr = curr->next;
+        //from first station add next station time until end station is reached
+        while(curr->StationID != station2)
+        {
+            if (curr == NULL)
+                break;
+            res += curr->NextStationCost;
+            curr = curr->next;
+        }
+        return res;
+    }
+
+    if (direction == "Backward"){
+        //loop list until the end first
+        while(curr->next != NULL)
+            curr = curr->next;
+
+        //traverse backward until first station matches
+        while(curr->prev != NULL && curr->StationID != station1)
+            curr = curr->prev;
+        //from first station add next station time until end station is reached
+        while(curr->StationID != station2)
+        {
+            if (curr == NULL)
+                break;
+            res += curr->PreviousStationCost;
+            curr = curr->prev;
+        }
+        return res;
+    }
+    return res;
+}
+
 #pragma endregion
 
 #pragma region Queue
@@ -632,7 +823,7 @@ void Station::DisplayAdminMenu(Node* hd)
         if (res == 1 ) {
             return SelectPaymentOrStation("admin");
         } else if (res == 2) {
-            return SelectPaymentOrStation("member");
+            return SelectPaymentOrStation(usr);
         }
         cout<<"Username or Password is incorrect!\n";
         return LoginUser(hd, st);
@@ -751,7 +942,7 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
         cout << "\n========================Ticket["<<id<<"]========================\n";
         cout << left << setw(30)<< "Ticket ID : " << curr->PaymentID <<endl;
         cout << left << setw(30)<< "Username : " << curr->Username <<endl;
-        cout << left << setw(30)<< "First : " << curr->FirstName <<endl;
+        cout << left << setw(30)<< "First Name : " << curr->FirstName <<endl;
         cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
         cout << left << setw(30)<< "Identification Number : " << curr->UserIC <<endl;
         cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
@@ -760,9 +951,9 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
         cout << left << setw(30)<< "End Station ID : " << curr->EndID <<endl;
         cout << left << setw(30)<< "End Station Name : " << curr->EndName <<endl;
         cout << left << setw(30)<< "Estimated Travel Duration : " << curr->Duration <<" minutes" <<endl;
-        cout << left << setw(30)<< "Departure Time: " << curr->EndName <<endl;
-        cout << left << setw(30)<< "Ticket Cost : RM " << curr->Amount <<endl;
-        cout << left << setw(30)<< "Time created : " << curr->TransactionDate;
+        cout << left << setw(30)<< "Departure Time: " << curr->DepartureTime <<endl;
+        cout << left << setw(30)<< "Ticket Cost : " << "RM " << curr->Amount <<endl;
+        cout << left << setw(30)<< "Time created : " << curr->TransactionDate << endl;
         cout << "============================================================\n" << endl;
         cout << "Return To List [1]\n";
         cout << "Selection >> ";
@@ -770,8 +961,14 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
         if(input == 1){
             break;
         }
-    } 
-    return ViewAllPayments(pHead, role);
+    }
+
+    if (role == "admin"){ return ViewAllPayments(pHead, role);}
+    
+    //'role' here is username
+    return ViewPaymentsMember(pHead, role);
+    
+    
 }
 
 // void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id, string usr)
@@ -889,6 +1086,39 @@ void PaymentList::ViewPayments(PaymentNode*pHead, string role, string searchBy, 
     return ViewAllPayments(pHead, role);
 }
 
+void PaymentList::ViewPaymentsMember(PaymentNode*pHead, string searchValue)
+{
+    PaymentNode* curr = pHead;
+    int count = 0, page = 1;
+    int size = GetListSize(pHead);
+    string selection;
+
+    cout << "\n*========================================Tickets [User : " << searchValue <<"]========================================*\n\n";
+    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "Start Station" << left
+            << setw(15) << "End Station" << endl;
+    while (curr != NULL){
+        if(curr->Username == searchValue){
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            << setw(15) << curr-> EndName << endl;
+        }
+        
+        count++;
+        curr = curr->next;
+    }
+    cout << "\n*=======================================================================================*\n\n";
+    cout << "Enter the Payment ID of the ticket to view the details.\nEnter 'BACK' to return to menu.\nEnter 'SORT' to sort list by first name.\n";
+    cout << "Selection >> ";
+    cin >> selection;
+    if (selection == "BACK"){ return DisplayAdminMenu(pHead); }
+    if (selection == "SORT"){}
+    int id = stoi(selection);
+    if (id >= 1 && id <= count){
+        return ViewPaymentDetails(pHead, searchValue, selection);
+    }
+    cout << "***Out of Bounds or invalid input!***" << endl;
+    return ViewPaymentsMember(pHead, searchValue);
+}
+
 void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
 {
     int selection;
@@ -899,7 +1129,7 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
     cout<<"Selection >> ";
     cin >> selection;
     //If selection is outside the range of optioons
-    if (selection <= 0 || selection > 3) { 
+    if (selection <= 0 || selection > 4) { 
         cout<<"\nInvalid option, please select again. \n";
         return DisplayAdminMenu(pHead);
     }
@@ -921,7 +1151,30 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
     return;
 }
 
-int PaymentList::GetListSize(PaymentNode* pHead){
+void PaymentList::DisplayMemberMenu(PaymentNode* pHead, string usr)
+{
+    int selection;
+    cout<<"\nWelcome back, "<< usr <<". What do you want to do today?" << endl;
+    cout<<"========== Please enter the corresponding option number ==========" << endl;
+    cout<<"1. Purchase New Ticket\n2. View Transaction History\n3. Exit system\n";
+    cout<<"==================================================================" <<endl;
+    cout<<"Selection >> ";
+    cin >> selection;
+    //If selection is outside the range of optioons
+    if (selection <= 0 || selection > 4) { 
+        cout<<"\nInvalid option, please select again. \n";
+        return DisplayMemberMenu(pHead, usr);
+    }
+    if (selection == 1) { return StartPurchaseMenu(pHead, usr);}
+    if (selection == 2) { 
+        ViewPaymentsMember(pHead, usr);
+    }
+    cout << "Thank you, have a good day.";
+    return;
+}
+
+int PaymentList::GetListSize(PaymentNode* pHead)
+{
     int count=0;
     PaymentNode* curr = pHead;
     while (curr != NULL){
@@ -930,6 +1183,93 @@ int PaymentList::GetListSize(PaymentNode* pHead){
     }
     return count;
 }
+
+void PaymentList::StartPurchaseMenu(PaymentNode* hd, string usr)
+{
+    int selection;
+    string direction, startStID, endStID;
+    bool valid;
+    cout<<"\nWhich direction are you headed?" << endl;
+    cout<<"========== Please enter the corresponding option number ==========" << endl;
+    cout<<"1. Titiwangsa -> Chan Sow Lin\n2. Chan Sow Lin -> Titiwangsa\n3. Cancel\n";
+    cout<<"==================================================================" <<endl;
+    cout<<"Selection >> ";
+    cin >> selection;
+    if (selection == 1){ direction = "Forward"; }
+    if (selection == 2){ direction = "Backward"; }
+    station.ViewAllStationsDirectional(head, direction); 
+    //enter start station ID
+    cout<<"Enter the starting Station ID >> ";
+    cin >> startStID;
+    valid = station.ValidateStationID(head, startStID);
+    if(!valid) {
+        cout << "Invalid Station ID!";
+        return StartPurchaseMenu(hd, usr);
+    }
+    //enter end station ID
+    cout<<"Enter the ending Station ID >> ";
+    cin >> endStID;
+    valid = station.ValidateStationID(head, endStID);
+    if(!valid) {
+        cout << "Invalid Station ID!";
+        return StartPurchaseMenu(hd, usr);
+    }
+    DisplayNewTicketDetails(hd, usr, startStID, endStID, direction);
+    return;
+}
+
+void PaymentList::DisplayNewTicketDetails(PaymentNode* pHead, string usr, string startStID, string endStID, string direction){
+
+    PaymentNode *curr = pHead;
+    Node* sCurr = head;
+    string startName, endName;
+    int dur = station.CalculateDurationBetweenStations(head, startStID, endStID, direction);
+    double cost = station.CalculateCostBetweenStations(head, startStID, endStID, direction);
+
+    //traverse to end of 
+    while (curr->next != NULL)
+        curr = curr->next;
+
+    while (true)
+    {   
+        if(sCurr == NULL)
+            break;
+        if (startStID == sCurr->StationID) { startName = sCurr->StationName; }
+        if (endStID == sCurr->StationID) { endName = sCurr->StationName; }
+
+        sCurr = sCurr->next;
+    }
+
+    int size = GetListSize(pHead);
+    int page = 1, input = 0, tId = 0;
+    tId = stoi(curr->PaymentID);
+
+    cout << "\n========================New Ticket========================\n";
+    cout << left << setw(30)<< "Ticket ID : " << tId + 1 <<endl;
+    cout << left << setw(30)<< "Username : " << usr <<endl;
+    cout << left << setw(30)<< "First Name : "  <<endl;
+    cout << left << setw(30)<< "Last Name : "  <<endl;
+    cout << left << setw(30)<< "Identification Number : " <<endl;
+    cout << left << setw(30)<< "Start Station ID : " << startStID <<endl;
+    cout << left << setw(30)<< "Start Station Name : " << startName <<endl;
+    cout << left << setw(30)<< "End Station ID : " << endStID <<endl;
+    cout << left << setw(30)<< "End Station Name : " << endName <<endl;
+    cout << left << setw(30)<< "Estimated Travel Duration : " << dur << " minutes" <<endl;
+    cout << left << setw(30)<< "Departure Time: "  <<endl;
+    cout << left << setw(30)<< "Ticket Cost : " << "RM " << cost <<endl;
+    cout << left << setw(30)<< "Time created : " <<endl;
+    cout << "============================================================\n" << endl;
+    // cout << "Return To List [1]\n";
+    // cout << "Selection >> ";
+    // cin >> input;
+    // if(input == 1){
+    //     break;
+    // }
+
+
+    return;
+}
+
 PaymentNode* PaymentList::SortList(PaymentNode* pHead, string sortBy){
     PaymentNode *curr = pHead;
     PaymentNode *sorted = new PaymentNode;
@@ -1056,6 +1396,8 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
 
 void SelectPaymentOrStation(string role)
 {
+    if (role == "admin")
+    {
     int selection;
     cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
@@ -1064,8 +1406,11 @@ void SelectPaymentOrStation(string role)
     cout<<"Selection >> ";
     cin >> selection;
     if(selection == 1) { return pList.DisplayAdminMenu(pHead); }
-    if(selection == 2) { return station.DisplayAdminMenu(head); }
-
+    if(selection == 2) { return station.DisplayAdminMenu(head); } 
+    }
+    
+    return pList.DisplayMemberMenu(pHead, role);
+    
     cout<<"\nInvalid option, please select again.\n";
     return SelectPaymentOrStation(role);
 }
@@ -1096,6 +1441,7 @@ int main()
     q.Enqueue("usr1", "1234", "Chong", "Kyle","admin");
     q.Enqueue("usr2", "1234", "Pek", "Yen", "admin");
     q.Enqueue("usr3", "1234", "Joo", "Ee", "admin");
+    q.Enqueue("mbr1", "1234", "Generic", "User", "member");
 
     //Set variable for current date & time
     time_t now = time(0);
