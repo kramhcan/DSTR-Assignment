@@ -12,7 +12,7 @@
 ~~1.2 Display the complete list of subway stations according to the selection of option 1.1.~~
 1.3 Search the subway station details.
 ~~1.4 View the details between two selected cities, e.g.~~
-~~- Display the total travel distance required between cities.~~
+- Display the total travel distance required between cities.
 ~~- Display the total travel expenses required between cities.~~
 ~~- Display the total travel time required between cities.~~
 1.5 Purchase subway ticket
