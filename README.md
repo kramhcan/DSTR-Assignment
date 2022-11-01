@@ -18,7 +18,7 @@
 1.5 Purchase subway ticket  
 - Display Ticket Details.  
 - Add Customer Information  
-- Display the estimated current arrival time from departure city to arrival city.
+- Display the estimated current arrival time from departure city to arrival city.    
 ~~1.6 View purchase transaction history~~  
 1.7 Delete purchase transaction  
 
