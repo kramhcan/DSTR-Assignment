@@ -18,7 +18,7 @@
 1.5 Purchase subway ticket  
 - Display Ticket Details.  
 - Add Customer Information  
-- Display the estimated current arrival time from departure city to arrival city.  
+- Display the estimated current arrival time from departure city to arrival city.
 ~~1.6 View purchase transaction history~~  
 1.7 Delete purchase transaction  
 
@@ -28,6 +28,6 @@
 ~~1.10 View purchase – View all purchase transactions~~  
 1.11 Sort purchase – Sort the purchase transactions based on passenger name in ascending  
 order  
-~~1.12 Search specific customer ticket purchase information~~
+~~1.12 Search specific customer ticket purchase information~~  
 1.13 Edit specific customer ticket purchase information (Cannot edit customer information, only the travel information on the ticket)  
 1.14 Delete specific customer ticket purchase information  
