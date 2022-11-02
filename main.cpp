@@ -125,7 +125,8 @@ class PaymentList {
     void DisplayNewTicketDetails(PaymentNode* hd, string usr, string startStID, string endStID, string direction);
 
     void DeletePayment(PaymentNode** hd, string id);
-    void EditPaymentAdmin(PaymentNode* hd, string id);
+    void EditPaymentAdmin(PaymentNode* hd, PaymentNode * curr);
+    void EditPaymentDetails(PaymentNode** head, string targetID, string newStartID, string newStartName, string newEndID, string newEndName, int newDuration, string newDeparture, double newCost, string dt);
 
     int GetListSize(PaymentNode* head);
     PaymentNode* SortList(PaymentNode* pHead, string sortBy);
@@ -750,7 +751,7 @@ int Station::CalculateDurationBetweenStations(Node* hd, string station1, string 
         }
         return res;
     }
-    return res;
+    return 0;
 }
 
 double Station::CalculateCostBetweenStations(Node* hd, string station1, string station2, string direction)
@@ -792,7 +793,7 @@ double Station::CalculateCostBetweenStations(Node* hd, string station1, string s
         }
         return res;
     }
-    return res;
+    return 0;
 }
 
 #pragma endregion
@@ -960,7 +961,7 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
         cout << left << setw(30)<< "Ticket Cost : " << "RM " << curr->Amount <<endl;
         cout << left << setw(30)<< "Time created : " << curr->TransactionDate << endl;
         cout << "============================================================\n" << endl;
-        cout << "[1] Return To List\nEnter 'DELETE' to delete this purchase history.\n";
+        cout << "[1] Return To List\nEnter 'EDIT' to edit this purchase entry\nEnter 'DELETE' to delete this purchase history.\n";
         cout << "Selection >> ";
         cin >> input;
         if(input == "1"){
@@ -972,6 +973,9 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
             if (input =="Y" || input == "y")
                 DeletePayment(&pHead, curr->PaymentID);
             break;
+        }
+        if(input == "EDIT"){
+            return EditPaymentAdmin(pHead, curr);
         }
     }
 
@@ -1359,88 +1363,129 @@ void PaymentList::DeletePayment(PaymentNode** pHead, string id)
     }
 }
 
-// void PaymentList::EditPaymentAdmin(Node * main, Node * curr)
-// {
-//     string newName;
-//     int nextTime = 0, prevTime = 0;
-//     double nextCost = 0, prevCost = 0;
-
-//     cout<< "Input new station name, replace spaces with '_' (Currently " << curr->StationName << ") : "; 
-//     cin>>newName;
-//     replace(newName.begin(), newName.end(), '_', ' ');
-//     if(curr->PreviousStationTime != 0)
-//     {
-//         cout<< "Input new time between previous station (Currently "<< curr->PreviousStationTime <<" minutes) : ";
-//         cin >> prevTime;
-//     }
-//     if(curr->PreviousStationCost != 0) {
-//         cout<< "Input new cost between previous station (Currently RM "<< curr->PreviousStationCost <<") : ";
-//         cin >> prevCost;
-//     }
-//     if(curr->NextStationTime != 0) {
-//         cout<< "Input new time between next station (Currently "<< curr->NextStationTime <<" minutes) : ";
-//         cin >> nextTime;
-//     }
-//     if(curr->NextStationCost != 0) {
-//         cout<< "Input new cost between next station (Currently RM "<< curr->NextStationCost <<") : ";
-//         cin >> nextCost;
-//     }
+void PaymentList::EditPaymentAdmin(PaymentNode * hd, PaymentNode * curr)
+{
+    //Set variable for current date & time
+    time_t now = time(0);
+    char* dt = ctime(&now);
     
-//     if (newName == ""){
-//         cout<<"***Input cannot be empty!***\n";
-//         return DisplayEditForm(main, curr);
-//     }
-//     if (prevTime == 0 || prevCost == 0) {
-//         cout<<"***Input cannot be empty!***";
-//         return DisplayEditForm(main, curr);
-//     }
-//     if (nextTime == 0 || nextCost == 0){
-//         cout<<"***Input cannot be empty!***";
-//         return DisplayEditForm(main, curr);
-//     }
+    string newStartID, newEndID, direction, newDeparture;
+    int newDuration = 0, selection = 0;
+    double newCost = 0, prevCost = 0;
 
-//     string input;
-//     //Form
-//     cout<<"\n**=============Edit Output=============**\n";
-//     cout << "Station ID : " << curr->StationID <<endl;
-//     cout << "Station Name : " << newName <<endl;
-//     cout << "Previous Station ID : " << curr->PreviousStationID <<endl;
-//     cout << "Previous Station Name : " << curr->PreviousStationName <<endl;
-//     cout << "Distance between previous station : " << curr->PreviousStationDistance <<endl;
-//     cout << "Time between previous station : " << prevTime << " minutes" <<endl;
-//     cout << "Cost between previous station : RM" << prevCost <<endl;
-//     cout << "Next Station ID : " << curr->NextStationID <<endl;
-//     cout << "Next Station Name : " << curr->NextStationName <<endl;
-//     cout << "Distance between next station : " << curr->NextStationDistance <<endl;
-//     cout << "Time between next station : " << nextTime <<" minutes" << endl;
-//     cout << "Cost between next station : RM" << nextCost <<endl;
-//     cout<<"\n**=========================================**\n";
-//     cout<<"Type in 'CANCEL' to stop operation and return to previous page*\n";
-//     cout<<"Type in 'CONFIRM' to proceed with the edit operation*\n";
-//     cout<<">>";
-//     cin>>input;
+    Node * currNew = head;
+
+    //Select new line direction
+    cout<<"\nSelect the new direction for the ticket" << endl;
+    cout<<"========== Please enter the corresponding option number ==========" << endl;
+    cout<<"1. Titiwangsa -> Chan Sow Lin\n2. Chan Sow Lin -> Titiwangsa\n3. Cancel\n";
+    cout<<"==================================================================" <<endl;
+    cout<<"Selection >> ";
+    cin >> selection;
+    if (selection == 1){ direction = "Forward"; }
+    if (selection == 2){ direction = "Backward"; }
+
+    cout<< "Input new starting station ID, replace spaces with '_' (Currently " << curr->StartID << ") : "; 
+    cin>>newStartID;
+    replace(newStartID.begin(), newStartID.end(), '_', ' ');
     
-//     if (input == "CANCEL"){ return DisplayAdminMenu(main); }
-//     if (input == "CONFIRM"){
-//         EditStationDetails(&main, curr->StationID, newName, prevCost, prevTime, nextCost, nextTime);
-//         return DisplayAdminMenu(main);
-//     }
-// }
+    //Traverse list to get station Name
+    while(currNew != NULL && currNew->StationID != newStartID)
+    {
+        if(currNew == NULL)
+            {
+                cout<<"No such station!";
+                return EditPaymentAdmin(hd, curr);
+            }
+        currNew = currNew->next;
+    }
+    
+    //declare new vars for new starting name
+    string newStartName = currNew->StationName;
+    cout<< "\nNew start station is " << newStartID << ", " << newStartName<< endl; 
 
-// void Station::EditPaymentDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime)
-// {
-//     // Node* curr = new Node;
-//     Node* last = *head;
 
-//     while (last->StationID != oldID)
-//         last = last->next;
+    //reset currNew list
+    currNew = head;
 
-//     last->StationName = editName;
-//     last->PreviousStationCost = editedPrevPrice;
-//     last->PreviousStationTime = editedPrevTime;
-//     last->NextStationCost = editedNextPrice;
-//     last->NextStationCost = editedNextTime;
-// }
+    cout<< "Input new ending station ID, replace spaces with '_' (Currently " << curr->EndID << ") : "; 
+    cin>>newEndID;
+    replace(newEndID.begin(), newEndID.end(), '_', ' ');
+
+    //Traverse list to get station name
+    while(currNew != NULL && currNew->StationID != newEndID)
+    {
+        if(currNew == NULL)
+            {
+                cout<<"No such station!";
+                return EditPaymentAdmin(hd, curr);
+            }
+        currNew = currNew->next;
+    }
+    
+    //declare new vars for new starting name
+    string newEndName = currNew->StationName;
+    cout<< "\nNew end station is " << newEndID << ", " << newEndName << endl; 
+
+    cout<< "Input new departure time (Currently "<< curr->DepartureTime <<") : ";
+    cin >> newDeparture;
+
+    newCost = station.CalculateCostBetweenStations(head,newStartID,newEndID,direction);
+    if (newCost == 0){
+        cout << "There was an error with the station input! Please re-enter details!";
+        return EditPaymentAdmin(hd, curr);
+    }
+
+    newDuration = station.CalculateDurationBetweenStations(head,newStartID,newEndID,direction);
+    if (newDuration == 0){
+        cout << "There was an error with the station input! Please re-enter details!";
+        return EditPaymentAdmin(hd, curr);
+    }
+
+
+    cout << "\n========================New Ticket========================\n";
+    cout << left << setw(30)<< "Ticket ID : " << curr->PaymentID <<endl;
+    cout << left << setw(30)<< "Username : " << curr->Username <<endl;
+    cout << left << setw(30)<< "First Name : " << curr->FirstName <<endl;
+    cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
+    cout << left << setw(30)<< "Identification Number : " << curr->UserIC <<endl;
+    cout << left << setw(30)<< "Start Station ID : " << newStartID <<endl;
+    cout << left << setw(30)<< "Start Station Name : " << newStartName <<endl;
+    cout << left << setw(30)<< "End Station ID : " << newEndID <<endl;
+    cout << left << setw(30)<< "End Station Name : " << newEndName <<endl;
+    cout << left << setw(30)<< "Estimated Travel Duration : " << newDuration << " minutes" <<endl;
+    cout << left << setw(30)<< "Departure Time: "  << newDeparture <<endl;
+    cout << left << setw(30)<< "Ticket Cost : " << "RM " << newCost <<endl;
+    cout << left << setw(30)<< "Time created : " << dt <<endl;
+    cout << "============================================================\n" << endl;
+    cout << "[1] to Confirm; Enter Anything Else to Cancel and Return to Menus\n";
+    cout << "Selection >> ";
+    cin >> selection;
+
+    if(selection == 1){
+        EditPaymentDetails(&pHead, curr->PaymentID, newStartID, newStartName, newEndID, newEndName, newDuration, newDeparture, newCost, dt);
+        return DisplayAdminMenu(pHead);
+    }
+    return DisplayAdminMenu(pHead);
+}
+
+void PaymentList::EditPaymentDetails(PaymentNode** head, string targetID, string newStartID, string newStartName, string newEndID, string newEndName, int newDuration, string newDeparture, double newCost, string dt)
+{
+    // Node* curr = new Node;
+    PaymentNode* last = *head;
+
+    while (last->PaymentID != targetID)
+        last = last->next;
+
+    last->StartID = newStartID;
+    last->StartName = newStartName;
+    last->EndID = newEndID;
+    last->EndName = newEndName;
+    last->Duration = newDuration;
+    last->DepartureTime = newDeparture;
+    last->Amount = newCost;
+    last->TransactionDate = dt;
+}
 
 
 PaymentNode* PaymentList::SortList(PaymentNode* pHead, string sortBy){
