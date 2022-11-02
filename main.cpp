@@ -55,6 +55,10 @@ void Station::DisplayAdminMenu(Node* hd)
         if (addSelection == 2){ DisplayInsertBackForm(hd, "", "", 0); }
     } 
     if (selection == 4) { return pList.DisplayAdminMenu(pHead); }
+    if (selection == 5) { 
+        cout<< "Thank you, have a good day.";
+        EXIT_SUCCESS;
+    }
     return;
 }
 #pragma endregion
@@ -99,6 +103,8 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
         string searchSel, searchVal;
         DisplaySelectSearchBy();
         cin >> searchSel;
+        if (searchSel == "6")
+            return DisplayAdminMenu(pHead);
         cout << "Enter search value (Enter station names for option 4 and 5) : ";
         cin >> searchVal;
         if (searchSel == "1") { ViewPayments(pHead, "admin", "username", searchVal);}
@@ -108,7 +114,10 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
         if (searchSel == "5") { ViewPayments(pHead, "admin", "endStation", searchVal);}
     }
     if (selection == 3) { station.DisplayAdminMenu(head); }
-    cout << "Thank you, have a good day.";
+    if (selection == 4) { 
+        cout<< "Thank you, have a good day.";
+        EXIT_SUCCESS;
+    }
     return;
 }
 

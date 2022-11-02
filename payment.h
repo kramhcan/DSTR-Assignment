@@ -54,12 +54,10 @@ class PaymentList {
     void EditPaymentAdmin(PaymentNode* hd, PaymentNode * curr);
     void EditPaymentDetails(PaymentNode** head, string targetID, string newStartID, string newStartName, string newEndID, string newEndName, int newDuration, string newDeparture, double newCost, string dt);
 
-    void InsertionSort(struct PaymentNode** head_ref);
-    void SortedInsert(struct PaymentNode** head_ref, struct PaymentNode* newNode);
+    void InsertionSort(PaymentNode** head_ref);
+    void SortedInsert(PaymentNode** head_ref, PaymentNode* newNode);
 
     int GetListSize(PaymentNode* head);
-    PaymentNode* SortList(PaymentNode* pHead, string sortBy);
-    string Minimum(string Member, PaymentNode* curr);
 };
 
 void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string lst, string ic, string startID, string startName,string endID, string endName, double amount, int duration, string date, string dpt)
@@ -174,20 +172,24 @@ void PaymentList::ViewAllPayments(PaymentNode*pHead, string role)
     string selection;
 
     cout << "\n*========================================Tickets========================================*\n\n";
-    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "Start Station" << left
+    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "First Name" << left << setw(15) << "Start Station" << left
             << setw(15) << "End Station" << endl;
     while (curr != NULL){
-        cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+        cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
 
         count++;
         curr = curr->next;
     }
     cout << "\n*=======================================================================================*\n\n";
-    cout << "Enter the Payment ID of the ticket to view the details. Enter 'BACK' to return to menu.\n";
+    cout << "Enter the Payment ID of the ticket to view the details. Enter 'BACK' to return to menu.\nEnter 'SORT' to sort list by first name.\n";
     cout << "Selection >> ";
     cin >> selection;
     if (selection == "BACK"){ return DisplayAdminMenu(pHead); }
+    if (selection == "SORT"){ 
+        InsertionSort(&pHead);
+        return ViewAllPayments(pHead, role); 
+        }
     int id = stoi(selection);
     if (id >= 1 && id <= count){
         return ViewPaymentDetails(pHead, role, selection);
@@ -204,27 +206,27 @@ void PaymentList::ViewPayments(PaymentNode*pHead, string role, string searchBy, 
     string selection;
 
     cout << "\n*========================================Tickets ["<< searchBy << " : " << searchValue <<"]========================================*\n\n";
-    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "Start Station" << left
+    cout    << left << setw(5) << "ID" << left << setw(10) << "User" << left << setw(15) << "First Name" << left << setw(15) << "Start Station" << left
             << setw(15) << "End Station" << endl;
     while (curr != NULL){
         if(searchBy == "username" && curr->Username == searchValue){
-            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
         }
         if(searchBy == "firstName" && curr->FirstName == searchValue){
-            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
         }
         if(searchBy == "lastName" && curr->LastName == searchValue){
-            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
         }
         if(searchBy == "startStation" && curr->StartName == searchValue){
-            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
         }
         if(searchBy == "endStation" && curr->EndName == searchValue){
-            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) << curr->StartName << left
+            cout << left << setw(5) << curr->PaymentID << left << setw(10) << curr-> Username << left << setw(15) <<  curr-> FirstName << left << setw(15) << curr->StartName << left
             << setw(15) << curr-> EndName << endl;
         }
         
@@ -237,7 +239,8 @@ void PaymentList::ViewPayments(PaymentNode*pHead, string role, string searchBy, 
     cin >> selection;
     if (selection == "BACK"){ return DisplayAdminMenu(pHead); }
     if (selection == "SORT"){
-        //:/
+        InsertionSort(&pHead);
+        return DisplayAdminMenu(pHead); 
     }
     int id = stoi(selection);
     if (id >= 1 && id <= count){
@@ -299,6 +302,7 @@ void PaymentList::DisplayMemberMenu(PaymentNode* pHead, string usr)
     }
     if (selection == 3){    
         cout << "Thank you, have a good day.";
+        EXIT_SUCCESS;
         return;
     }
 }
@@ -370,92 +374,70 @@ void PaymentList::EditPaymentDetails(PaymentNode** head, string targetID, string
     last->TransactionDate = dt;
 }
 
-PaymentNode* PaymentList::SortList(PaymentNode* pHead, string sortBy)
+void PaymentList::SortedInsert(struct PaymentNode** head_ref, struct PaymentNode* newNode)
 {
-    PaymentNode *curr = pHead;
-    PaymentNode *sorted = new PaymentNode;
-
-    string mini;
-
-    if (sortBy == "username"){
-        mini = Minimum(sortBy, curr);
-        while(curr->Username != mini)
-            curr = curr->next;
-        sorted = curr;
-        sorted->next = NULL;
-
+    PaymentNode* current;
+ 
+    // if list is empty
+    if (*head_ref == NULL)
+        *head_ref = newNode;
+ 
+    // if the node is to be inserted at the beginning
+    // of the doubly linked list
+    else if ((*head_ref)->FirstName >= newNode->FirstName) {
+        newNode->next = *head_ref;
+        newNode->next->prev = newNode;
+        *head_ref = newNode;
+    }
+ 
+    else {
+        current = *head_ref;
+ 
+        // locate the node after which the new node
+        // is to be inserted
+        while (current->next != NULL &&
+               current->next->FirstName < newNode->FirstName)
+            current = current->next;
+ 
+        /*Make the appropriate links */
+ 
+        newNode->next = current->next;
+ 
+        // if the new node is not inserted
+        // at the end of the list
+        if (current->next != NULL)
+            newNode->next->prev = newNode;
+ 
+        current->next = newNode;
+        newNode->prev = current;
     }
 }
-
-string PaymentList::Minimum(string member, PaymentNode* curr)
+ 
+// function to sort a doubly linked list using insertion sort
+void PaymentList::InsertionSort(struct PaymentNode** head_ref)
 {
-    PaymentNode *p = curr;
-    string minimum;
-    if (member == "username")
-        {
-            minimum = p->Username;
-
-        while (p->next != NULL)
-        {
-            p = p->next;
-            if(minimum > p->Username)
-            {
-                    minimum = p->Username;
-            }
-        }
+    // Initialize 'sorted' - a sorted doubly linked list
+     PaymentNode* sorted = NULL;
+ 
+    // Traverse the given doubly linked list and
+    // insert every node to 'sorted'
+     PaymentNode* current = *head_ref;
+    while (current != NULL) {
+ 
+        // Store next for next iteration
+         PaymentNode* next = current->next;
+ 
+        // removing all the links so as to create 'current'
+        // as a new node for insertion
+        current->prev = current->next = NULL;
+ 
+        // insert current in 'sorted' doubly linked list
+        SortedInsert(&sorted, current);
+ 
+        // Update current
+        current = next;
     }
-    if (member == "firstName")
-        {
-            minimum = p->FirstName;
-
-        while (p->next != NULL)
-        {
-            p = p->next;
-            if(minimum > p->FirstName)
-            {
-                    minimum = p->FirstName;
-            }
-        }
-    }
-    if (member == "lastName")
-        {
-            minimum = p->LastName;
-
-        while (p->next != NULL)
-        {
-            p = p->next;
-            if(minimum > p->LastName)
-            {
-                    minimum = p->LastName;
-            }
-        }
-    }
-    if (member == "startStation")
-        {
-            minimum = p->StartName;
-
-        while (p->next != NULL)
-        {
-            p = p->next;
-            if(minimum > p->StartName)
-            {
-                    minimum = p->StartName;
-            }
-        }
-    }
-    if (member == "endStation")
-        {
-            minimum = p->EndName;
-
-        while (p->next != NULL)
-        {
-            p = p->next;
-            if(minimum > p->EndName)
-            {
-                    minimum = p->EndName;
-            }
-        }
-    }
-
-    return minimum;
+ 
+    // Update head_ref to point to sorted doubly linked list
+    *head_ref = sorted;
 }
