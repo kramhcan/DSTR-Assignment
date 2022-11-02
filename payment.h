@@ -53,6 +53,9 @@ class PaymentList {
     void EditPaymentAdmin(PaymentNode* hd, PaymentNode * curr);
     void EditPaymentDetails(PaymentNode** head, string targetID, string newStartID, string newStartName, string newEndID, string newEndName, int newDuration, string newDeparture, double newCost, string dt);
 
+    void InsertionSort(struct PaymentNode** head_ref);
+    void SortedInsert(struct PaymentNode** head_ref, struct PaymentNode* newNode);
+
     int GetListSize(PaymentNode* head);
     PaymentNode* SortList(PaymentNode* pHead, string sortBy);
     string Minimum(string Member, PaymentNode* curr);
