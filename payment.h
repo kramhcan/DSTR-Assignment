@@ -106,3 +106,56 @@ void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string
     newNode->prev = last;
     return; 
 }
+
+void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id)
+{
+    //admin view
+    PaymentNode *curr = pHead;
+    int size = GetListSize(pHead);
+    int page = 1, tId = 0;
+    string input;
+
+    while(curr->PaymentID != id)
+        curr = curr->next;
+    
+    while(page)
+    {
+        cout << "\n========================Ticket["<<id<<"]========================\n";
+        cout << left << setw(30)<< "Ticket ID : " << curr->PaymentID <<endl;
+        cout << left << setw(30)<< "Username : " << curr->Username <<endl;
+        cout << left << setw(30)<< "First Name : " << curr->FirstName <<endl;
+        cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
+        cout << left << setw(30)<< "Identification Number : " << curr->UserIC <<endl;
+        cout << left << setw(30)<< "Last Name : " << curr->LastName <<endl;
+        cout << left << setw(30)<< "Start Station ID : " << curr->StartID <<endl;
+        cout << left << setw(30)<< "Start Station Name : " << curr->StartName <<endl;
+        cout << left << setw(30)<< "End Station ID : " << curr->EndID <<endl;
+        cout << left << setw(30)<< "End Station Name : " << curr->EndName <<endl;
+        cout << left << setw(30)<< "Estimated Travel Duration : " << curr->Duration <<" minutes" <<endl;
+        cout << left << setw(30)<< "Departure Time: " << curr->DepartureTime <<endl;
+        cout << left << setw(30)<< "Ticket Cost : " << "RM " << curr->Amount <<endl;
+        cout << left << setw(30)<< "Time created : " << curr->TransactionDate << endl;
+        cout << "============================================================\n" << endl;
+        cout << "[1] Return To List\nEnter 'EDIT' to edit this purchase entry\nEnter 'DELETE' to delete this purchase history.\n";
+        cout << "Selection >> ";
+        cin >> input;
+        if(input == "1"){
+            break;
+        }
+        if(input == "DELETE"){
+            cout<<"Are you sure? This action cannot be undone [Y/n]\nInput >> ";
+            cin >> input;
+            if (input =="Y" || input == "y")
+                DeletePayment(&pHead, curr->PaymentID);
+            break;
+        }
+        if(input == "EDIT"){
+            return EditPaymentAdmin(pHead, curr);
+        }
+    }
+
+    if (role == "admin"){ return ViewAllPayments(pHead, role);}
+    
+    //'role' here is username
+    return ViewPaymentsMember(pHead, role);
+}
