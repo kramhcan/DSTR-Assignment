@@ -57,3 +57,52 @@ class PaymentList {
     PaymentNode* SortList(PaymentNode* pHead, string sortBy);
     string Minimum(string Member, PaymentNode* curr);
 };
+
+void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string lst, string ic, string startID, string startName,string endID, string endName, double amount, int duration, string date, string dpt)
+{
+    PaymentNode* newNode = new PaymentNode;
+    PaymentNode* last = *pHead;
+    PaymentNode* last1 = last;
+    int id = 0;
+
+    if (last1 != NULL)
+    {
+        while (last1->next != NULL)
+            last1 = last1->next;
+        id = stoi(last1->PaymentID);
+    }    
+    
+    id++;
+    stringstream ss;
+    string idString;
+    ss << id;
+    ss >> idString;
+
+    newNode->PaymentID = idString;
+    newNode->Username = usr;
+    newNode->FirstName = fst;
+    newNode->LastName = lst;
+    newNode->UserIC = ic;
+    newNode->StartID = startID;
+    newNode->StartName = startName;
+    newNode->EndID = endID;
+    newNode->EndName = endName;
+    newNode->Duration = duration;
+    newNode->Amount = amount;
+    newNode->TransactionDate = date;
+    newNode->DepartureTime = dpt;
+    newNode->next = nullptr;
+
+    if(*pHead == NULL)
+    {
+        *pHead = newNode;
+        return;
+    }
+    
+    while (last->next != NULL)
+        last = last->next;
+
+    last->next = newNode;
+    newNode->prev = last;
+    return; 
+}
