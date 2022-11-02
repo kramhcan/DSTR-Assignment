@@ -27,7 +27,7 @@
 
 ~~1.6 View purchase transaction history~~  
 
-__1.7 Delete purchase transaction__  
+~~1.7 Delete purchase transaction~~  
 
 **Admins**  
 ~~1.8 Add new subway station information~~  
@@ -42,4 +42,4 @@ __1.11 Sort purchase – Sort the purchase transactions based on passenger name 
 
 __1.13 Edit specific customer ticket purchase information (Cannot edit customer information, only the travel information on the ticket)__  
 
-__1.14 Delete specific customer ticket purchase information__  
+~~1.14 Delete specific customer ticket purchase information~~  

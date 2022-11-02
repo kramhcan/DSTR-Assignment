@@ -124,6 +124,9 @@ class PaymentList {
     void SelectStations(PaymentNode* hd, string direction);
     void DisplayNewTicketDetails(PaymentNode* hd, string usr, string startStID, string endStID, string direction);
 
+    void DeletePayment(PaymentNode** hd, string id);
+    void EditPaymentAdmin(PaymentNode* hd, string id);
+
     int GetListSize(PaymentNode* head);
     PaymentNode* SortList(PaymentNode* pHead, string sortBy);
     string Minimum(string Member, PaymentNode* curr);
@@ -964,7 +967,11 @@ void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id
             break;
         }
         if(input == "DELETE"){
-            //TODO
+            cout<<"Are you sure? This action cannot be undone [Y/n]\nInput >> ";
+            cin >> input;
+            if (input =="Y" || input == "y")
+                DeletePayment(&pHead, curr->PaymentID);
+            break;
         }
     }
 
@@ -1160,7 +1167,7 @@ void PaymentList::DisplayMemberMenu(PaymentNode* pHead, string usr)
     int selection;
     cout<<"\nWelcome back, "<< usr <<". What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
-    cout<<"1. Purchase New Ticket\n2. View Transaction History\n3. Exit system\n";
+    cout<<"1. Start New Purchase\n2. View Transaction History\n3. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
@@ -1173,8 +1180,10 @@ void PaymentList::DisplayMemberMenu(PaymentNode* pHead, string usr)
     if (selection == 2) { 
         ViewPaymentsMember(pHead, usr);
     }
-    cout << "Thank you, have a good day.";
-    return;
+    if (selection == 3){    
+        cout << "Thank you, have a good day.";
+        return;
+    }
 }
 
 int PaymentList::GetListSize(PaymentNode* pHead)
@@ -1264,6 +1273,7 @@ void PaymentList::DisplayNewTicketDetails(PaymentNode* pHead, string usr, string
     cout << "Selection >> ";
     int selection = 0;
     cin >> selection;
+    cin.ignore();
     if (selection != 1) { 
         return StartPurchaseMenu(pHead, usr);
     }
@@ -1271,20 +1281,16 @@ void PaymentList::DisplayNewTicketDetails(PaymentNode* pHead, string usr, string
     string dept, first, last, id; 
 
     cout << "\nEnter Your Departure Time (06:00AM to 01:00AM format)\nInput >> ";
-    cin >> dept;
-    cin.ignore();
+    getline(cin, dept);
 
     cout << "\nEnter your First Name\nInput >> ";
-    cin >> first;
-    cin.ignore();
+    getline(cin, first);
 
     cout << "\nEnter your Last Name\nInput >> ";
-    cin >> last;
-    cin.ignore();
+    getline(cin, last);
 
     cout << "\nEnter your Identification Number\nInput >> ";
-    cin >> id;
-    cin.ignore();
+    getline(cin, id);
 
     cout << "\n========================New Ticket========================\n";
     cout << left << setw(30)<< "Ticket ID : " << tId + 1 <<endl;
@@ -1314,6 +1320,128 @@ void PaymentList::DisplayNewTicketDetails(PaymentNode* pHead, string usr, string
 
     return DisplayMemberMenu(pHead, usr);
 }
+
+void PaymentList::DeletePayment(PaymentNode** pHead, string id)
+{
+    // Store head node
+    PaymentNode* temp = *pHead;
+    PaymentNode* prev = NULL;
+     
+    // If head node itself holds
+    // the id to be deleted
+    if (temp != NULL && temp->PaymentID == id)
+    {
+        *pHead = temp->next; // Changed head
+        delete temp;            // free old head
+        return;
+    }
+ 
+    // Else Search for the id to be deleted,
+    // keep track of the previous node as we
+    // need to change 'prev->next' */
+      else
+    {
+    while (temp != NULL && temp->PaymentID != id)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+ 
+    // If id was not present in linked list
+    if (temp == NULL)
+        return;
+ 
+    // Unlink the node from linked list
+    prev->next = temp->next;
+ 
+    // Free memory
+    delete temp;
+    }
+}
+
+// void PaymentList::EditPaymentAdmin(Node * main, Node * curr)
+// {
+//     string newName;
+//     int nextTime = 0, prevTime = 0;
+//     double nextCost = 0, prevCost = 0;
+
+//     cout<< "Input new station name, replace spaces with '_' (Currently " << curr->StationName << ") : "; 
+//     cin>>newName;
+//     replace(newName.begin(), newName.end(), '_', ' ');
+//     if(curr->PreviousStationTime != 0)
+//     {
+//         cout<< "Input new time between previous station (Currently "<< curr->PreviousStationTime <<" minutes) : ";
+//         cin >> prevTime;
+//     }
+//     if(curr->PreviousStationCost != 0) {
+//         cout<< "Input new cost between previous station (Currently RM "<< curr->PreviousStationCost <<") : ";
+//         cin >> prevCost;
+//     }
+//     if(curr->NextStationTime != 0) {
+//         cout<< "Input new time between next station (Currently "<< curr->NextStationTime <<" minutes) : ";
+//         cin >> nextTime;
+//     }
+//     if(curr->NextStationCost != 0) {
+//         cout<< "Input new cost between next station (Currently RM "<< curr->NextStationCost <<") : ";
+//         cin >> nextCost;
+//     }
+    
+//     if (newName == ""){
+//         cout<<"***Input cannot be empty!***\n";
+//         return DisplayEditForm(main, curr);
+//     }
+//     if (prevTime == 0 || prevCost == 0) {
+//         cout<<"***Input cannot be empty!***";
+//         return DisplayEditForm(main, curr);
+//     }
+//     if (nextTime == 0 || nextCost == 0){
+//         cout<<"***Input cannot be empty!***";
+//         return DisplayEditForm(main, curr);
+//     }
+
+//     string input;
+//     //Form
+//     cout<<"\n**=============Edit Output=============**\n";
+//     cout << "Station ID : " << curr->StationID <<endl;
+//     cout << "Station Name : " << newName <<endl;
+//     cout << "Previous Station ID : " << curr->PreviousStationID <<endl;
+//     cout << "Previous Station Name : " << curr->PreviousStationName <<endl;
+//     cout << "Distance between previous station : " << curr->PreviousStationDistance <<endl;
+//     cout << "Time between previous station : " << prevTime << " minutes" <<endl;
+//     cout << "Cost between previous station : RM" << prevCost <<endl;
+//     cout << "Next Station ID : " << curr->NextStationID <<endl;
+//     cout << "Next Station Name : " << curr->NextStationName <<endl;
+//     cout << "Distance between next station : " << curr->NextStationDistance <<endl;
+//     cout << "Time between next station : " << nextTime <<" minutes" << endl;
+//     cout << "Cost between next station : RM" << nextCost <<endl;
+//     cout<<"\n**=========================================**\n";
+//     cout<<"Type in 'CANCEL' to stop operation and return to previous page*\n";
+//     cout<<"Type in 'CONFIRM' to proceed with the edit operation*\n";
+//     cout<<">>";
+//     cin>>input;
+    
+//     if (input == "CANCEL"){ return DisplayAdminMenu(main); }
+//     if (input == "CONFIRM"){
+//         EditStationDetails(&main, curr->StationID, newName, prevCost, prevTime, nextCost, nextTime);
+//         return DisplayAdminMenu(main);
+//     }
+// }
+
+// void Station::EditPaymentDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime)
+// {
+//     // Node* curr = new Node;
+//     Node* last = *head;
+
+//     while (last->StationID != oldID)
+//         last = last->next;
+
+//     last->StationName = editName;
+//     last->PreviousStationCost = editedPrevPrice;
+//     last->PreviousStationTime = editedPrevTime;
+//     last->NextStationCost = editedNextPrice;
+//     last->NextStationCost = editedNextTime;
+// }
+
 
 PaymentNode* PaymentList::SortList(PaymentNode* pHead, string sortBy){
     PaymentNode *curr = pHead;
@@ -1491,8 +1619,11 @@ int main()
     time_t now = time(0);
     char* dt = ctime(&now);
 
-    pList.AddPayment(&pHead, "member1", "Member", "Dummy", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20 PM");
-    pList.AddPayment(&pHead, "member2", "Member", "Two", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20 PM");
+    //header pointer, username, first name, last name, ic, first station id
+    //,first station name, last station id, last station name, cost
+    //, distance, current date time, departure time
+    pList.AddPayment(&pHead, "member1", "Member", "Dummy", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20PM");
+    pList.AddPayment(&pHead, "member2", "Member", "Two", "012345678901", "SS01" , "Titiwangsa", "SS03", "Sultan Ismail", 1.2, 12, dt, "4:20PM");
 
     DisplayStartOptions(q, head, station);
     return 0;
