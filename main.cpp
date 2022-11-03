@@ -417,7 +417,6 @@ void DisplayStartOptions(Queue q, Node* hd, Station st)
         cout << "Error converting string to int, please enter whole numbers\n";
         return DisplayStartOptions(q, hd, st);
     }
-    
     if(selectionInt == 1) { return q.LoginUser(hd, st); }
     if(selectionInt == 2) { 
         q.RegisterUser(hd, st);
