@@ -184,7 +184,17 @@ void PaymentList::DisplayNewTicketDetails(PaymentNode* pHead, string usr, string
 
     int size = GetListSize(pHead);
     int page = 1, input = 0, tId = 0;
-    tId = stoi(curr->PaymentID);
+    
+    try
+    {
+        tId = stoi(curr->PaymentID);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return DisplayNewTicketDetails(pHead, usr, startStID, endStID, direction);
+    }
     cout << "\nReview Station Selection and Details Below";
     cout << "\n========================Purchase Details========================\n";
     cout << left << setw(30)<< "Start Station ID : " << startStID <<endl;

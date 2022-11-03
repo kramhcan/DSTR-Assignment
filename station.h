@@ -392,7 +392,16 @@ void Station::DisplayInsertBackForm(Node* hd, string stID, string stName, int pr
         cout<<"Enter Distance Between Previous Station : ";
         cin>>dist;
         if (dist == "CANCEL") { return DisplayAdminMenu(hd); }
-        prevDist = stoi(dist);
+        try
+        {
+            prevDist = stoi(dist);
+        }
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+            cout << "Error converting string to int, please enter whole numbers\n";
+            return DisplayInsertBackForm(hd, stID, stName, prevDist);
+        }
         return DisplayInsertBackForm(hd, stID, stName, prevDist);
     }   
     //Confirmation Check
@@ -445,7 +454,16 @@ void Station::DisplayInsertFrontForm(Node* hd, string stID, string stName, int n
         cout<<"Enter Distance Between Next Station : ";
         cin>>dist;
         if (dist == "CANCEL") { return DisplayAdminMenu(hd); }
-        nextDist = stoi(dist);
+        try
+        {
+            nextDist = stoi(dist);
+        }
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+            cout << "Error converting string to int, please enter whole numbers\n";
+            return DisplayInsertFrontForm(hd, stID, stName, nextDist);
+        }
         return DisplayInsertFrontForm(hd, stID, stName, nextDist);
     }   
     //Confirmation Check

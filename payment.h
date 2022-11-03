@@ -71,7 +71,17 @@ void PaymentList::AddPayment(PaymentNode** pHead, string usr, string fst, string
     {
         while (last1->next != NULL)
             last1 = last1->next;
-        id = stoi(last1->PaymentID);
+        
+        try
+        {
+            id = stoi(last1->PaymentID);
+        }
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+            cout << "Error converting string to int, please enter whole numbers\n";
+            return;
+        }
     }    
     
     id++;
@@ -190,10 +200,21 @@ void PaymentList::ViewAllPayments(PaymentNode*pHead, string role)
         InsertionSort(&pHead);
         return ViewAllPayments(pHead, role); 
         }
-    int id = stoi(selection);
-    if (id >= 1 && id <= count){
-        return ViewPaymentDetails(pHead, role, selection);
+    
+    try
+    {
+        int id = stoi(selection);
+        if (id >= 1 && id <= count){
+            return ViewPaymentDetails(pHead, role, selection);
+        }
     }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return ViewAllPayments(pHead, role);
+    }
+    
     cout << "***ID Out of Bounds or invalid input!***" << endl;
     return ViewAllPayments(pHead, role);
 }
@@ -242,9 +263,18 @@ void PaymentList::ViewPayments(PaymentNode*pHead, string role, string searchBy, 
         InsertionSort(&pHead);
         return DisplayAdminMenu(pHead); 
     }
-    int id = stoi(selection);
-    if (id >= 1 && id <= count){
-        return ViewPaymentDetails(pHead, role, selection);
+    try
+    {
+        int id = stoi(selection);
+        if (id >= 1 && id <= count){
+            return ViewPaymentDetails(pHead, role, selection);
+        }
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return ViewAllPayments(pHead, role);
     }
     cout << "***ID Out of Bounds or invalid input!***" << endl;
     return ViewAllPayments(pHead, role);
@@ -274,9 +304,19 @@ void PaymentList::ViewPaymentsMember(PaymentNode*pHead, string searchValue)
     cout << "Selection >> ";
     cin >> selection;
     if (selection == "BACK"){ return DisplayMemberMenu(pHead, searchValue); }
-    int id = stoi(selection);
-    if (id >= 1 && id <= count){
-        return ViewPaymentDetails(pHead, searchValue, selection);
+    
+    try
+    {
+        int id = stoi(selection);
+        if (id >= 1 && id <= count){
+            return ViewPaymentDetails(pHead, searchValue, selection);
+        }
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return ViewPaymentsMember(pHead, searchValue);
     }
     cout << "***Out of Bounds or invalid input!***" << endl;
     return ViewPaymentsMember(pHead, searchValue);
