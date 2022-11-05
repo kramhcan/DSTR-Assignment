@@ -24,38 +24,60 @@ string EST(int hour, int minute, int duration);
 #pragma region StationList
 void Station::DisplayAdminMenu(Node* hd)
 {
-    int selection;
+    string selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
     cout<<"1. View all stations\n2. View Station Details\n3. Add a new station\n4. Show Payment Menu\n5. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
+    int selectionInt = 0;
+    try
+    {
+        selectionInt = stoi(selection);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return DisplayAdminMenu(hd);
+    }
     //If selection is outside the range of optioons
-    if (selection <= 0 || selection > 4) { 
+    if (selectionInt <= 0 || selectionInt > 5) { 
         cout<<"\nInvalid option, please select again. \n";
         return DisplayAdminMenu(hd);
     }
-    if (selection == 1) { return ViewAllStations(hd, "admin");}
-    if (selection == 2) { return ViewStationDetails(hd, "admin");}
-    if (selection == 3) {
+    if (selectionInt == 1) { return ViewAllStations(hd, "admin");}
+    if (selectionInt == 2) { return ViewStationDetails(hd, "admin");}
+    if (selectionInt == 3) {
         // int stationCount = 0;
         // stationCount = DisplaySelectionOfPositionsReturnCount(hd);
-        int addSelection;
+        string addSelection;
         cout<<"*========PLEASE SELECT========*\n";
         cout<<"1. Front\n2. End\n";
         cout<<"*=============================*\n";
         cout<<"Selection >> "; 
         cin>>addSelection;
-        if (addSelection <= 0 || addSelection > 2) {
+        int addSelectionInt = 0;
+        try
+        {
+            addSelectionInt = stoi(addSelection);
+        }
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+            cout << "Error converting string to int, please enter whole numbers\n";
+            return DisplayAdminMenu(hd);
+        }
+        if (addSelectionInt <= 0 || addSelectionInt > 2) {
             cout<<"\nInvalid option, please select again.\n"<<endl;
             return DisplayAdminMenu(hd);
         }
-        if (addSelection == 1){ DisplayInsertFrontForm(hd, "", "", 0); }
-        if (addSelection == 2){ DisplayInsertBackForm(hd, "", "", 0); }
+        if (addSelectionInt == 1){ DisplayInsertFrontForm(hd, "", "", 0); }
+        if (addSelectionInt == 2){ DisplayInsertBackForm(hd, "", "", 0); }
     } 
-    if (selection == 4) { return pList.DisplayAdminMenu(pHead); }
-    if (selection == 5) { 
+    if (selectionInt == 4) { return pList.DisplayAdminMenu(pHead); }
+    if (selectionInt == 5) { 
         cout<< "Thank you, have a good day.";
         EXIT_SUCCESS;
     }
@@ -86,20 +108,31 @@ void Queue::LoginUser(Node* hd, Station st)
 #pragma region PaymentList
 void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
 {
-    int selection;
+    string selection;
     cout<<"\nWelcome back, Admin. What do you want to do today?" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
     cout<<"1. View All Payments\n2. Search Payments List\n3. Show Station Menu\n4. Exit system\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
+    int selectionInt = 0;
+    try
+    {
+        selectionInt = stoi(selection);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return DisplayAdminMenu(pHead);
+    }
     //If selection is outside the range of optioons
-    if (selection <= 0 || selection > 4) { 
+    if (selectionInt <= 0 || selectionInt > 4) { 
         cout<<"\nInvalid option, please select again. \n";
         return DisplayAdminMenu(pHead);
     }
-    if (selection == 1) { return ViewAllPayments(pHead, "admin");}
-    if (selection == 2) { 
+    if (selectionInt == 1) { return ViewAllPayments(pHead, "admin");}
+    if (selectionInt == 2) { 
         string searchSel, searchVal;
         DisplaySelectSearchBy();
         cin >> searchSel;
@@ -113,8 +146,8 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
         if (searchSel == "4") { ViewPayments(pHead, "admin", "startStation", searchVal);}
         if (searchSel == "5") { ViewPayments(pHead, "admin", "endStation", searchVal);}
     }
-    if (selection == 3) { station.DisplayAdminMenu(head); }
-    if (selection == 4) { 
+    if (selectionInt == 3) { station.DisplayAdminMenu(head); }
+    if (selectionInt == 4) { 
         cout<< "Thank you, have a good day.";
         EXIT_SUCCESS;
     }
@@ -123,7 +156,7 @@ void PaymentList::DisplayAdminMenu(PaymentNode* pHead)
 
 void PaymentList::StartPurchaseMenu(PaymentNode* hd, string usr)
 {
-    int selection;
+    string selection;
     string direction, startStID, endStID;
     bool valid;
     cout<<"\nWhich direction are you headed?" << endl;
@@ -132,9 +165,20 @@ void PaymentList::StartPurchaseMenu(PaymentNode* hd, string usr)
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
-    if (selection == 1){ direction = "Forward"; }
-    if (selection == 2){ direction = "Backward"; }
-    if (selection == 3){ return DisplayMemberMenu(hd, usr);}
+    int selectionInt = 0;
+    try
+    {
+        selectionInt = stoi(selection);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return StartPurchaseMenu(hd, usr);
+    }
+    if (selectionInt == 1){ direction = "Forward"; }
+    if (selectionInt == 2){ direction = "Backward"; }
+    if (selectionInt == 3){ return DisplayMemberMenu(hd, usr);}
     station.ViewAllStationsDirectional(head, direction); 
     //enter start station ID
     cout<<"Enter the starting Station ID >> ";
@@ -262,7 +306,8 @@ void PaymentList::EditPaymentAdmin(PaymentNode * hd, PaymentNode * curr)
     char* dt = ctime(&now);
     
     string newStartID, newEndID, direction, newDeparture;
-    int newDuration = 0, selection = 0;
+    int newDuration = 0;
+    string selection;
     double newCost = 0, prevCost = 0;
 
     Node * currNew = head;
@@ -274,8 +319,19 @@ void PaymentList::EditPaymentAdmin(PaymentNode * hd, PaymentNode * curr)
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
-    if (selection == 1){ direction = "Forward"; }
-    if (selection == 2){ direction = "Backward"; }
+    int selectionInt = 0;
+    try
+    {
+        selectionInt = stoi(selection);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return EditPaymentAdmin(hd, curr);
+    }
+    if (selectionInt == 1){ direction = "Forward"; }
+    if (selectionInt == 2){ direction = "Backward"; }
 
     cout<< "Input new starting station ID, replace spaces with '_' (Currently " << curr->StartID << ") : "; 
     cin>>newStartID;
@@ -352,7 +408,7 @@ void PaymentList::EditPaymentAdmin(PaymentNode * hd, PaymentNode * curr)
     cout << "Selection >> ";
     cin >> selection;
 
-    if(selection == 1){
+    if(selectionInt == 1){
         EditPaymentDetails(&pHead, curr->PaymentID, newStartID, newStartName, newEndID, newEndName, newDuration, newDeparture, newCost, dt);
         return DisplayAdminMenu(pHead);
     }
@@ -430,15 +486,26 @@ void SelectPaymentOrStation(string role)
 {
     if (role == "admin")
     {
-    int selection;
+    string selection;
     cout<<"\n*****KUALA LUMPUR LIGHT RAIL TRANSIT (LRT) TICKET PURCHASE SYSTEM*****" << endl;
     cout<<"========== Please enter the corresponding option number ==========" << endl;
     cout<<"1. Payments\n2. Stations\n";
     cout<<"==================================================================" <<endl;
     cout<<"Selection >> ";
     cin >> selection;
-    if(selection == 1) { return pList.DisplayAdminMenu(pHead); }
-    if(selection == 2) { return station.DisplayAdminMenu(head); } 
+    int selectionInt = 0;
+    try
+    {
+        selectionInt = stoi(selection);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        cout << "Error converting string to int, please enter whole numbers\n";
+        return SelectPaymentOrStation(role);
+    }
+    if(selectionInt == 1) { return pList.DisplayAdminMenu(pHead); }
+    if(selectionInt == 2) { return station.DisplayAdminMenu(head); } 
     }
     
     return pList.DisplayMemberMenu(pHead, role);
