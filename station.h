@@ -134,7 +134,6 @@ void Station::AddStationFront(Node** head, string newID, string newName, string 
         (*head)->PreviousStationTime = 0;
     }
     
-    
     //Set next pointer of new node
 	newNode->next = (*head);
 
@@ -146,10 +145,8 @@ double Station::CalculatePriceByDistance(Node* head, string direction)
 {
     double price = 0.0;
     if (direction == "Forward") {
-        // if (head->NextStationDistance == 0) { return 0; }
         price =  head->NextStationDistance * 0.1;
     } else if (direction == "Backward") {
-        // if (head->PreviousStationDistance == 0) { return 0; }
         price =  head->PreviousStationDistance * 0.1;
     }
     return price;
@@ -159,10 +156,8 @@ int Station::CalculateTimeByDistance(Node* head, string direction)
 {
     int time = 0;
     if (direction == "Forward") {
-        // if (head->NextStationDistance == 0) { return 0; }
         time =  head->NextStationDistance - 1 ;
     } else if (direction == "Backward") {
-        // if (head->PreviousStationDistance == 0) { return 0; }
         time =  head->PreviousStationDistance - 1;
     }
     return time;
@@ -559,7 +554,6 @@ void Station::DisplayEditForm(Node * main, Node * curr)
 
 void Station::EditStationDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime)
 {
-    // Node* curr = new Node;
     Node* last = *head;
 
     while (last->StationID != oldID)
@@ -583,25 +577,6 @@ bool Station::ValidateStationID(Node* main, string stID)
             break;
         curr = curr->next;
     }
-
-    // if (direction == "Forward")
-    // {
-    //     while (curr->next != NULL)
-    //     {
-    //         if(curr->StationID == stID){ return true; }
-    //         curr = curr->next;
-    //     }
-    // }
-    // if (direction == "Backward")
-    // {
-    //     while (curr->next != NULL)
-    //         curr = curr->next;
-    //     while (curr->prev != NULL)
-    //     {
-    //         if(curr->StationID == stID){ return true; }
-    //         curr = curr->prev;
-    //     }
-    // }
 
     return false;
 }
