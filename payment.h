@@ -36,9 +36,7 @@ class PaymentList {
     public:
     void AddPayment(PaymentNode** head, string usr, string fst, string lst, string ic, string startID, string startName,string endID, string endName, double amount, int duration, string date, string dpt);
     void ViewPaymentDetails(PaymentNode*head, string role, string id);
-    void ViewPaymentDetails(PaymentNode*head, string role, string id, string usr);
     void ViewAllPayments(PaymentNode*head, string role);
-    void ViewAllPayments(PaymentNode*head, string role, string id, string usr);
     void ViewPayments(PaymentNode*pHead, string role, string searchBy, string searchValue);
     void ViewPaymentsMember(PaymentNode*pHead, string searchValue);
     void DisplayAdminMenu(PaymentNode* hd);
@@ -47,7 +45,6 @@ class PaymentList {
     //Display start purchase menu -> Select Direction -> Select stations -> Display Ticket details
     //->Confirm purchase -> Add payment
     void StartPurchaseMenu(PaymentNode* hd, string usr);
-    void SelectStations(PaymentNode* hd, string direction);
     void DisplayNewTicketDetails(PaymentNode* hd, string usr, string startStID, string endStID, string direction);
 
     void DeletePayment(PaymentNode** hd, string id);

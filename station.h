@@ -53,8 +53,6 @@ class Station {
         bool ValidateStationID(Node* main, string stID);
         int CalculateDurationBetweenStations(Node* hd, string station1, string station2, string direction);
         double CalculateCostBetweenStations(Node* hd, string station1, string station2, string direction);
-        // void GetFrontGetBack(Node* hd);
-        // void GetBackGetFront(Node* hd);
         
 };
 
@@ -583,25 +581,6 @@ bool Station::ValidateStationID(Node* main, string stID)
             break;
         curr = curr->next;
     }
-
-    // if (direction == "Forward")
-    // {
-    //     while (curr->next != NULL)
-    //     {
-    //         if(curr->StationID == stID){ return true; }
-    //         curr = curr->next;
-    //     }
-    // }
-    // if (direction == "Backward")
-    // {
-    //     while (curr->next != NULL)
-    //         curr = curr->next;
-    //     while (curr->prev != NULL)
-    //     {
-    //         if(curr->StationID == stID){ return true; }
-    //         curr = curr->prev;
-    //     }
-    // }
 
     return false;
 }

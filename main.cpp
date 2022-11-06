@@ -416,41 +416,6 @@ void PaymentList::EditPaymentAdmin(PaymentNode * hd, PaymentNode * curr)
 }
 #pragma endregion
 
-// void PaymentList::ViewPaymentDetails(PaymentNode * pHead, string role, string id, string usr)
-// {
-//     //admin view
-//     PaymentNode *curr = pHead;
-//     int size = GetListSize(pHead);
-//     int page = 1, input = 0, tId = 0;
-
-//     while(curr->PaymentID != id)
-//         curr = curr->next;
-    
-
-//     while(page)
-//     {
-//         cout << "\n========================Ticket["<<id<<"]========================\n";
-//         cout << "Ticket ID : " << curr->PaymentID <<endl;
-//         cout << "Username : " << curr->Username <<endl;
-//         cout << "First : " << curr->FirstName <<endl;
-//         cout << "Last Name : " << curr->LastName <<endl;
-//         cout << "Start Station ID : " << curr->StartID <<endl;
-//         cout << "Start Station Name : " << curr->StartName <<endl;
-//         cout << "End Station ID : " << curr->EndID <<endl;
-//         cout << "End Station Name : " << curr->EndName <<endl;
-//         cout << "Travel Duration : " << curr->Duration <<" minutes" <<endl;
-//         cout << "Ticket Cost : RM " << curr->Amount <<endl;
-//         cout << "Time created : " << curr->Date;
-//         cout << "============================================================\n" << endl;
-//         cout << "Return To List [1]\n";
-//         cout << "Selection >> ";
-//         cin >> input;
-//         if(input == 3){
-//             break;
-//         }
-//     }  
-// }
-
 #pragma region non-member methods
 
 void DisplayStartOptions(Queue q, Node* hd, Station st)
