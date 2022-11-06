@@ -276,6 +276,7 @@ void Station::ViewStationDetails(Node*head, string role)
     int size = GetListSize(head);
     int page = 1;
     int input = 0;
+    string inputnum;
     while(page)
     {
         //Print out stationID and stationName
@@ -295,7 +296,16 @@ void Station::ViewStationDetails(Node*head, string role)
         cout << "\n============================================================\n" << endl;
         cout << "Next Page [1] || Previous Page [2] || Edit Current Station [3] || Return to menu [4]\n";
         cout << "Selection >> ";
-        cin >> input;
+        cin >> inputnum;
+        try {
+            input= stoi(inputnum);
+        } 
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+            cout << "Error converting string to int, please enter whole numbers\n";
+            return ViewStationDetails(head, role);
+        }
         if (input == 1){
             if(page == size) { 
                 cout << "\n***********OUT OF PAGE BOUNDS!***********!\n";
