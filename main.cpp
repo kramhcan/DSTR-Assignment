@@ -493,8 +493,8 @@ int main()
 {
     //Add default stations
     station.AddStationBack(&head, "SS01", "Titiwangsa", "N/A", "N/A", 0);
-    station.AddStationBack(&head, "SS02", "PTWC", "SS01", "Titiwangsa", 4);
-    station.AddStationBack(&head, "SS03", "Sultan Ismail", "SS02", "PTWC", 8);
+    station.AddStationBack(&head, "SS02", "PWTC", "SS01", "Titiwangsa", 4);
+    station.AddStationBack(&head, "SS03", "Sultan Ismail", "SS02", "PWTC", 8);
     station.AddStationBack(&head, "SS04", "Majlis Jamek", "SS03", "Sultan Ismail", 8);
     station.AddStationBack(&head, "SS05", "Plaza Rakyat", "SS04", "Majlis Jamek", 6);
     station.AddStationBack(&head, "SS06", "Hang Tuah", "SS05", "Plaza Rakyat", 10);
