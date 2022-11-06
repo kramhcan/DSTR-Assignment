@@ -492,6 +492,7 @@ void Station::DisplayEditForm(Node * main, Node * curr)
     string newName;
     int nextTime = 0, prevTime = 0;
     double nextCost = 0, prevCost = 0;
+    bool first = false, last = false;
 
     cout<< "Input new station name, replace spaces with '_' (Currently " << curr->StationName << ") : "; 
     cin>>newName;
@@ -500,31 +501,47 @@ void Station::DisplayEditForm(Node * main, Node * curr)
     {
         cout<< "Input new time between previous station (Currently "<< curr->PreviousStationTime <<" minutes) : ";
         cin >> prevTime;
+    } else { 
+        first = true; 
     }
     if(curr->PreviousStationCost != 0) {
         cout<< "Input new cost between previous station (Currently RM "<< curr->PreviousStationCost <<") : ";
         cin >> prevCost;
+    } else {
+        first = true;
     }
     if(curr->NextStationTime != 0) {
         cout<< "Input new time between next station (Currently "<< curr->NextStationTime <<" minutes) : ";
         cin >> nextTime;
+    } else {
+        last = true;
     }
     if(curr->NextStationCost != 0) {
         cout<< "Input new cost between next station (Currently RM "<< curr->NextStationCost <<") : ";
         cin >> nextCost;
+    } else {
+        last = true;
     }
     
     if (newName == ""){
         cout<<"***Input cannot be empty!***\n";
         return DisplayEditForm(main, curr);
     }
-    if (prevTime == 0 || prevCost == 0) {
-        cout<<"***Input cannot be empty!***";
-        return DisplayEditForm(main, curr);
+
+    if(!first)
+    {
+        if (prevTime == 0 || prevCost == 0) {
+            cout<<"***Input cannot be empty!***";
+            return DisplayEditForm(main, curr);
+        }
     }
-    if (nextTime == 0 || nextCost == 0){
-        cout<<"***Input cannot be empty!***";
-        return DisplayEditForm(main, curr);
+
+    if(!last)
+    {
+        if (nextTime == 0 || nextCost == 0) {
+            cout<<"***Input cannot be empty!***";
+            return DisplayEditForm(main, curr);
+        }
     }
 
     string input;
@@ -555,19 +572,19 @@ void Station::DisplayEditForm(Node * main, Node * curr)
     }
 }
 
-void Station::EditStationDetails(Node** head, string oldID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime)
+void Station::EditStationDetails(Node** head, string ID, string editName, double editedPrevPrice, int editedPrevTime, double editedNextPrice, int editedNextTime)
 {
     // Node* curr = new Node;
     Node* last = *head;
 
-    while (last->StationID != oldID)
+    while (last->StationID != ID)
         last = last->next;
 
     last->StationName = editName;
     last->PreviousStationCost = editedPrevPrice;
     last->PreviousStationTime = editedPrevTime;
     last->NextStationCost = editedNextPrice;
-    last->NextStationCost = editedNextTime;
+    last->NextStationTime = editedNextTime;
 }
 
 bool Station::ValidateStationID(Node* main, string stID)
